@@ -42,9 +42,7 @@ README.html
 # R Environment Variables
 .Renviron
 
-# pkgdown site
-docs/
-inst/doc
+
 
 # translation temp files
 po/*~
