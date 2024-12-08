@@ -1,0 +1,40 @@
+fusen_dev.Rmd:
+  path: dev/fusen_dev.Rmd
+  state: active
+  R:
+  - R/annotate_gadget.R
+  - R/binned_pal.R
+  - R/iom_pal.R
+  - R/iom_pal_display.R
+  - R/iom_pal_display_all.R
+  - R/iom_pal_name.R
+  - R/iom_pal_scale.R
+  - R/package_font_import.R
+  - R/package_font_installed.R
+  - R/package_font_registered.R
+  - R/iom_scale.R
+  - R/theme_iom.R
+  - R/update_geom_font_defaults.R
+  tests:
+  - tests/testthat/test-theme_iom.R
+  - tests/testthat/test-update_geom_font_defaults.R
+  - tests/testthat/test-package_font_installed.R
+  - tests/testthat/test-package_font_import.R
+  - tests/testthat/test-package_font_registered.R
+  - tests/testthat/test-iom_pal_display_all.R
+  - tests/testthat/test-iom_pal_display.R
+  - tests/testthat/test-iom_pal_name.R
+  - tests/testthat/test-iom_pal_scale.R
+  - tests/testthat/test-iom_pal.R
+  - tests/testthat/test-iom_scale.R
+  - tests/testthat/test-binned_pal.R
+  - tests/testthat/test-annotate_gadget.R
+  vignettes: []
+  inflate:
+    flat_file: dev/fusen_dev.Rmd
+    vignette_name: .na
+    open_vignette: true
+    check: true
+    document: true
+    overwrite: ask
+    clean: ask

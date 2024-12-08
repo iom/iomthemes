@@ -1,0 +1,54 @@
+Type: Package
+Package: iomthemes
+Title: IOM 'ggplot2' Theme and Colour Palettes
+Version: 0.1.1
+Authors@R: c(
+    person("Edouard", "Legoupil", , "elegoupil@iom.int", role = c("aut", "cre")),
+    person("IOM", role = "cph")
+  )
+Description: A 'ggplot2' theme and color palettes following IOM visual
+    branding recommendations.
+License: MIT + file LICENSE
+URL: https://github.com/iom/iomthemes, https://iom.github.io/iomthemes/
+BugReports: https://github.com/iom/iomthemes/issues
+Depends:
+    R (>= 3.5)
+Imports:
+    extrafont,
+    ggplot2,
+    ggrepel,
+    ggtext,
+    graphics,
+    grDevices,
+    grid,
+    miniUI,
+    scales,
+    shiny,
+    stringr,
+    systemfonts
+Suggests:
+    classInt,
+    countrycode,
+    dplyr,
+    ggstream,
+    janitor,
+    knitr,
+    ragg,
+    readxl,
+    rmarkdown,
+    rnaturalearth,
+    rnaturalearthdata,
+    sf,
+    testthat,
+    tidyverse,
+    treemapify,
+    WDI
+VignetteBuilder: 
+    knitr
+Config/fusen/version: 0.6.0
+Config/Needs/website: iom/iomtemplate
+Config/testthat/edition: 3
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2

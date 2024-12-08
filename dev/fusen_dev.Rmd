@@ -1,0 +1,1871 @@
+---
+title: "flat_first.Rmd for working package"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+<!-- Run this 'development' chunk -->
+<!-- Store every call to library() that you need to explore your functions -->
+
+```{r development, include=FALSE}
+library(testthat)
+```
+
+<!--
+ You need to run the 'description' chunk in the '0-dev_history.Rmd' file before continuing your code there.
+
+If it is the first time you use {fusen}, after 'description', you can directly run the last chunk of the present file with inflate() inside.
+--> 
+
+```{r development-load}
+# Load already included functions if relevant
+pkgload::load_all(export_all = FALSE)
+```
+
+# Demo data 
+<!-- 
+ Store your dataset in a directory named "inst/" at the root of your project.
+ Use it for your tests in this Rmd thanks to `pkgload::load_all()` to make it available
+and `system.file()` to read it in your examples.
+
+- There already is a dataset in the "inst/" directory to be used in the examples below
+-->
+
+```{r development-dataset}
+# Run all this chunk in the console directly
+# There already is a dataset in the "inst/" directory
+# Make the dataset file available to the current Rmd during development
+pkgload::load_all(path = here::here(), export_all = FALSE)
+
+## The files are within the 'inst' - installation folder of the package
+file.sex.destination.origin <- system.file(
+  "undesa_pd_2020_ims_stock_by_sex_destination_and_origin.xlsx",
+                                           package = "iomthemes")
+
+data.sex.destination.origin <- readxl::read_excel(file.sex.destination.origin,
+                                          sheet = "Table 1", skip = 9) |>
+  ## Getting clean variable names
+  janitor::clean_names() 
+```
+
+
+# Theming 
+
+## theme_iom
+
+```{r function-theme_iom}
+#' IOM [ggplot2] theme
+#'
+#' \code{theme_iom} provides a basic \bold{IOM} theme
+#' to use in \bold{ggplot2} commands.
+#'
+#' @rdname theme_iom
+#'
+#' @param font_family Base font family `"Open Sans"`.
+#' You need to have `"Open Sans"` font installed on your device in order to use it.
+#' @param font_size Base font size in pt. Default to 12 pts.
+#' @param plot_title_size Plot title font size. Default to `font_size` * 1.35.
+#' @param plot_title_margin Plot title bottom margin. Default to `font_size`.
+#' @param subtitle_size Plot subtitle font size. Default to `font_size`.
+#' @param subtitle_margin Plot subtitle bottom margin. Default to `font_size` * 1.5.
+#' @param strip_text_size Facet label font size. Default to `font_size` * 0.9.
+#' @param strip_text_face Facet label font face. Default to "bold".
+#' @param strip_text_just Facet label justification. Default to 0.
+#' @param caption_size Caption font size. Default to `font_size` * 0.7.
+#' @param caption_margin Caption top margin. Default to `font_size`.
+#' @param axis_text Logical `TRUE`/`FALSE` or `xy`. Turn on and off axis label.
+#' Use `x` or `y` to have only the correspondent active. Default to `TRUE`.
+#' @param axis_text_size Axis label font size. Default to `font_size` * 0.9.
+#' @param axis_title Logical `TRUE`/`FALSE` or `xy`. Turn on and off axis title.
+#' Use `x` or `y` to have only the correspondent active. Default to `TRUE`.
+#' @param axis_title_size Axis title font size. Default to `font_size` * 0.9.
+#' @param axis Logical `TRUE`/`FALSE` or `xy`. Turn on and off axis.
+#' Use `x` or `y` to have only the correspondent axis active. Don't forget to review
+#' the `expand` argument of the `scale_x_*`/`scale_y_*` to avoid spacing between
+#' the axis and the baseline of the plot. Default to `FALSE`.
+#' @param axis_ticks Logical `TRUE`/`FALSE` or `xy`. Turn on and off axis ticks.
+#' Use `x` or `y` to have only the correspondent axis ticks active. Default to `FALSE`.
+#' @param grid Logical `TRUE`/`FALSE` or a combination of `X` or `x` and `Y` or y`.
+#' Turn on and off panel grids. Use `X` or `Y` for major grids,
+#' and `x` or `y` for minor grid.  Default to `XY`.
+#' @param legend Logical `TRUE`/`FALSE`. Turn on and off the legend.
+#' Default to `TRUE`.
+#' @param legend_text_size Legend key font size. Default to `font_size` * 0.9.
+#' @param legend_title Logical `TRUE`/`FALSE`. Turn on and off the legend title.
+#' Default to `FALSE`.
+#' @param legend_title_size Legend title font size. Default to `font_size` * 0.9.
+#' @param plot_margin Plot margin (specify with `ggplot2::margin()`).
+#' Default to `ggplot2::margin(font_size, font_size, font_size, font_size)`.
+#' @param plot_background Plot background.
+#' Put "transparent" for no background color. Default to "white".
+#' @param void Logical `TRUE`/`FALSE`. If `TRUE`, all grid lines, ticks
+#' and axes are removed. Default to `FALSE`.
+#'
+#' @return A ggplot2 theme object, the theme style.
+#' @import ggplot2
+#' @export
+theme_iom <- function(
+    font_family = if (package_font_installed()) "Open Sans" else "Arial",
+    font_size = 12,
+    plot_title_size = rel(1.35),
+    plot_title_margin = font_size,
+    subtitle_size = font_size,
+    subtitle_margin = font_size * 1.5,
+    strip_text_size = rel(0.9),
+    strip_text_face = "bold",
+    strip_text_just = 0,
+    caption_size = rel(0.7),
+    caption_margin = font_size,
+    axis_text = TRUE,
+    axis_text_size = rel(0.9),
+    axis_title = TRUE,
+    axis_title_size = rel(0.9),
+    axis = FALSE,
+    axis_ticks = FALSE,
+    grid = "XY",
+    legend = TRUE,
+    legend_text_size = rel(0.9),
+    legend_title = FALSE,
+    legend_title_size = rel(0.9),
+    plot_margin = margin(font_size, font_size, font_size, font_size),
+    plot_background = "#ffffff",
+    void = FALSE) {
+  # colors
+  dark_text <- "#1a1a1a"
+  light_text <- "#666666"
+  grid_col <- "#cccccc"
+
+  # base theme override
+  ret <- theme_minimal(base_family = font_family, base_size = font_size)
+
+  ret <- ret + theme(text = element_text(
+    family = font_family,
+    color = dark_text
+  ))
+
+  # title
+  ret <- ret + theme(plot.title = ggtext::element_textbox_simple(
+    family = font_family,
+    size = plot_title_size,
+    face = "bold",
+    color = "#000000",
+    hjust = 0,
+    lineheight = 1.2,
+    margin = margin(0, 0, plot_title_margin, 0, "pt")
+  ))
+  ret <- ret + theme(plot.title.position = "plot")
+
+  # subtitle
+  ret <- ret + theme(plot.subtitle = ggtext::element_textbox_simple(
+    family = font_family,
+    size = subtitle_size,
+    face = "plain",
+    color = dark_text,
+    hjust = 0,
+    lineheight = 1.2,
+    margin = margin(0, 0, subtitle_margin, 0, "pt")
+  ))
+
+  # strip
+  ret <- ret + theme(strip.text = element_text(
+    family = font_family,
+    size = strip_text_size,
+    face = strip_text_face,
+    color = dark_text,
+    hjust = strip_text_just
+  ))
+
+  # caption
+  ret <- ret + theme(plot.caption = ggtext::element_textbox_simple(
+    family = font_family,
+    size = caption_size,
+    face = "plain",
+    color = light_text,
+    hjust = 0,
+    lineheight = 1.1,
+    margin = margin(caption_margin, 0, 0, 0, "pt"),
+  ))
+  ret <- ret + theme(plot.caption.position = "plot")
+
+  # axis text
+  if (inherits(axis_text, "character") | axis_text == TRUE) {
+    ret <- ret + theme(axis.text = element_text(
+      size = axis_text_size,
+      color = dark_text
+    ))
+    if (inherits(axis_text, "character")) {
+      axis_text <- tolower(axis_text)
+      if (regexpr("x", axis_text)[1] < 0) {
+        ret <- ret + theme(axis.text.x = element_blank())
+      } else {
+        ret <- ret + theme(axis.text.x = element_text(
+          size = axis_text_size,
+          color = dark_text
+        ))
+      }
+      if (regexpr("y", axis_text)[1] < 0) {
+        ret <- ret + theme(axis.text.y = element_blank())
+      } else {
+        ret <- ret + theme(axis.text.y = element_text(
+          size = axis_text_size,
+          color = dark_text
+        ))
+      }
+    } else {
+      ret <- ret + theme(axis.text.x = element_text(
+        size = axis_text_size,
+        color = dark_text
+      ))
+      ret <- ret + theme(axis.text.y = element_text(
+        size = axis_text_size,
+        color = dark_text
+      ))
+    }
+  } else {
+    ret <- ret + theme(axis.text = element_blank())
+  }
+
+  # axis title
+  if (inherits(axis_title, "character") | axis_title == TRUE) {
+    ret <- ret + theme(axis.title = element_text(
+      size = axis_title_size,
+      color = light_text
+    ))
+    if (inherits(axis_title, "character")) {
+      axis_title <- tolower(axis_title)
+      if (regexpr("x", axis_title)[1] < 0) {
+        ret <- ret + theme(axis.title.x = element_blank())
+      } else {
+        ret <- ret + theme(axis.title.x = element_text(
+          size = axis_title_size,
+          color = light_text
+        ))
+      }
+      if (regexpr("y", axis_title)[1] < 0) {
+        ret <- ret + theme(axis.title.y = element_blank())
+      } else {
+        ret <- ret + theme(axis.title.y = element_text(
+          size = axis_title_size,
+          color = light_text
+        ))
+      }
+    } else {
+      ret <- ret + theme(axis.title.x = element_text(
+        size = axis_title_size,
+        color = light_text
+      ))
+      ret <- ret + theme(axis.title.y = element_text(
+        size = axis_title_size,
+        color = light_text
+      ))
+    }
+  } else {
+    ret <- ret + theme(axis.title = element_blank())
+  }
+
+  # void
+  if (void) {
+    ret <- ret + theme(
+      line = element_blank(),
+      rect = element_blank(),
+      axis.line = element_blank(),
+      axis.line.x = NULL,
+      axis.line.y = NULL,
+      axis.text = element_blank(),
+      axis.text.x = NULL,
+      axis.text.x.top = NULL,
+      axis.text.y = NULL,
+      axis.text.y.right = NULL,
+      axis.ticks = element_blank(),
+      axis.ticks.length = grid::unit(0, "pt"),
+      axis.title = element_blank(),
+      axis.title.x = NULL,
+      axis.title.x.top = NULL,
+      axis.title.y = NULL,
+      axis.title.y.right = NULL
+    )
+  } else {
+    # axis line
+    if (inherits(axis, "character") | axis == TRUE) {
+      ret <- ret + theme(axis.line = element_line(
+        color = dark_text,
+        linewidth = rel(0.8)
+      ))
+      if (inherits(axis, "character")) {
+        axis <- tolower(axis)
+        if (regexpr("x", axis)[1] < 0) {
+          ret <- ret + theme(axis.line.x = element_blank())
+        } else {
+          ret <- ret + theme(axis.line.x = element_line(
+            color = dark_text
+          ))
+        }
+        if (regexpr("y", axis)[1] < 0) {
+          ret <- ret + theme(axis.line.y = element_blank())
+        } else {
+          ret <- ret + theme(axis.line.y = element_line(
+            color = dark_text
+          ))
+        }
+      } else {
+        ret <- ret + theme(axis.line.x = element_line(
+          color = dark_text
+        ))
+        ret <- ret + theme(axis.line.y = element_line(
+          color = dark_text
+        ))
+      }
+    } else {
+      ret <- ret + theme(axis.line = element_blank())
+    }
+
+    # axis ticks
+    if (inherits(axis_ticks, "character") | axis_ticks == TRUE) {
+      ret <- ret + theme(axis.ticks.length = grid::unit(
+        font_size / 2, "pt"
+      ))
+      ret <- ret + theme(axis.ticks = element_line(
+        color = grid_col,
+        linewidth = rel(.6)
+      ))
+      if (inherits(axis_ticks, "character")) {
+        axis_ticks <- tolower(axis_ticks)
+        if (regexpr("x", axis_ticks)[1] < 0) {
+          ret <- ret + theme(axis.ticks.x = element_blank())
+        } else {
+          ret <- ret + theme(axis.ticks.x = element_line(
+            color = grid_col
+          ))
+        }
+        if (regexpr("y", axis_ticks)[1] < 0) {
+          ret <- ret + theme(axis.ticks.y = element_blank())
+        } else {
+          ret <- ret + theme(axis.ticks.y = element_line(
+            color = grid_col
+          ))
+        }
+      } else {
+        ret <- ret + theme(axis.ticks.x = element_line(
+          color = grid_col
+        ))
+        ret <- ret + theme(axis.ticks.y = element_line(
+          color = grid_col
+        ))
+      }
+    } else {
+      ret <- ret + theme(axis.ticks = element_blank())
+    }
+
+    # grid
+    if (inherits(grid, "character") | grid == TRUE) {
+      ret <- ret + theme(panel.grid = element_line(
+        color = grid_col,
+        linewidth = rel(.6)
+      ))
+      ret <- ret + theme(panel.grid.major = element_line(
+        color = grid_col
+      ))
+      ret <- ret + theme(panel.grid.minor = element_line(
+        color = grid_col
+      ))
+
+      if (inherits(grid, "character")) {
+        if (regexpr("X", grid)[1] < 0) {
+          ret <- ret + theme(panel.grid.major.x = element_blank())
+        }
+        if (regexpr("Y", grid)[1] < 0) {
+          ret <- ret + theme(panel.grid.major.y = element_blank())
+        }
+        if (regexpr("x", grid)[1] < 0) {
+          ret <- ret + theme(panel.grid.minor.x = element_blank())
+        }
+        if (regexpr("y", grid)[1] < 0) {
+          ret <- ret + theme(panel.grid.minor.y = element_blank())
+        }
+      }
+    } else {
+      ret <- ret + theme(panel.grid = element_blank())
+    }
+  }
+
+  # legend
+  if (!legend) {
+    ret <- ret + theme(legend.position = "none")
+  } else {
+    ret <- ret + theme(legend.text = element_text(
+      size = legend_text_size,
+      color = dark_text
+    ))
+    ret <- ret + theme(legend.position = "top")
+    ret <- ret + theme(legend.justification = 0)
+    if (!legend_title) {
+      ret <- ret + theme(legend.title = element_blank())
+    } else {
+      ret <- ret + theme(legend.title = element_text(
+        size = legend_title_size,
+        color = dark_text,
+        face = "bold"
+      ))
+    }
+  }
+
+  # tag
+  ret <- ret + theme(plot.tag = element_text(
+    size = font_size,
+    color = "#0072bc",
+    hjust = 0,
+    vjust = 1
+  ))
+  ret <- ret + theme(plot.tag.position = c(0, 1))
+
+  # margin
+  ret <- ret + theme(plot.margin = plot_margin)
+
+  # background
+  ret <- ret + theme(plot.background = element_rect(
+    fill = plot_background,
+    color = plot_background
+  ))
+
+  ret
+}
+
+
+
+```
+  
+```{r example-theme_iom}
+## Usage
+
+#After loading the `{iomthemes}` package, you can apply the theme to 
+# any `{ggplot2}` chart, by simply adding `theme_iom` at your call. 
+
+# For example:
+
+# Load packages
+library(ggplot2)
+library(iomthemes)
+
+# A dummy data frame
+df <- data.frame(
+  date = factor(rep(2010:2020, 2)),
+  val = c(
+    10.2, 10.2, 10.2, 11.5, 14,
+    15.8, 17, 19.5, 20.5, 24.5, 20.6,
+    4.9, 4.9, 4.9, 5.5, 5.5, 5.6,
+    5.6, 5.7, 5.7, 5.8, 5.9
+  ),
+  set = rep(c("Set 1", "Set 2"), each = 11)
+)
+
+# Base plot with theme_iom()
+ggplot(
+  data = df,
+  aes(x = date, y = val, fill = set)
+) +
+  geom_col(
+    position = position_stack(reverse = TRUE),
+    width = 0.8
+  ) +
+  labs(
+    title = "My title | 2010-2020",
+    subtitle = "My subtitle",
+    x = "date",
+    y = "values",
+    caption = "Source: Dummy data"
+  ) +
+  theme_iom()
+
+# The theme comes with some default settings, but you can customize most of it
+#by adding parameters to the function call, as we will explore below.
+
+## Grid
+
+# The `grid` parameter controls the display of both major and minor grid lines 
+#in your plot. By default, major grid lines are visible and minor ones are hidden.
+# 
+# Using `grid = "XY"` adds both major X and Y grid lines, `grid = "X"` adds
+# only major X grid lines, `grid = "Y"` adds only major Y grid lines, 
+#and `grid = FALSE` removes all grid lines. 
+# You can add minor grid lines by using lowercase `"xy"`, `"x"` or `"y"`. 
+
+#For example, let’s keep only the major Y grid lines:
+ 
+ggplot(
+  data = df,
+  aes(x = date, y = val, fill = set)
+) +
+  geom_col(
+    position = position_stack(reverse = TRUE),
+    width = 0.8
+  ) +
+  labs(
+    title = "My title | 2010-2020",
+    subtitle = "My subtitle",
+    x = "date",
+    y = "values",
+    caption = "Source: Dummy data"
+  ) +
+  theme_iom(
+    grid = "Y" # Only major Y grid lines
+  )
+ 
+
+# # Axis
+
+# Unsurprisingly, the axis represents the axis lines. However, it also includes
+#different axis elements such as the axis title, axis text, and axis ticks.
+
+### Axis lines
+
+#To control the visibility of axis lines, you can use the `axis` parameter 
+# in the `theme_iom` function. By default, this parameter is set to `FALSE`,
+# which turns off all the axis lines. Using `axis = "XY"` (or `axis = TRUE`)
+# adds both X and Y axis, `axis = "X"` adds only the X axis, `axis = "Y"` 
+#adds only the Y axis, and `axis = FALSE` removes all axis elements. 
+
+#For example, let's add only the X axis:
+
+ 
+ggplot(
+  data = df,
+  aes(x = date, y = val, fill = set)
+) +
+  geom_col(
+    position = position_stack(reverse = TRUE),
+    width = 0.8
+  ) +
+  labs(
+    title = "My title | 2010-2020",
+    subtitle = "My subtitle",
+    x = "date",
+    y = "values",
+    caption = "Source: Dummy data"
+  ) +
+  theme_iom(
+    grid = "Y",
+    axis = "X" # Only X axis
+  )
+ 
+# Some space is missing! This is because `{ggplot2}` comes, by default, 
+# with some expansion around the axis to create some room. 
+# To remove this extra space, you can use the `expand` argument 
+# in the `scale_x_*` or `scale_y_*` function.
+# 
+# **Modify the axis expansion:**
+# 
+# In this example, we will set the `expand` argument to `expansion(c(0, 0.01))` 
+# for the y axis to remove the unwanted space, effectively “expanding” the axis
+# by removing the space at the axis origin and adding a small padding 
+# at the other end.
+
+ggplot(
+  data = df,
+  aes(x = date, y = val, fill = set)
+) +
+  geom_col(
+    position = position_stack(reverse = TRUE),
+    width = 0.8
+  ) +
+  labs(
+    title = "My title | 2010-2020",
+    subtitle = "My subtitle",
+    x = "date",
+    y = "values",
+    caption = "Source: Dummy data"
+  ) +
+  scale_y_continuous(
+    expand = expansion(c(0, 0.01)) # Remove axis expansion
+  ) +
+  theme_iom(
+    grid = "Y",
+    axis = "X"
+  )
+ 
+
+### Axis title and text
+
+#To control the visibility of axis titles and text, you can use the `axis_title`
+# and `axis_text` parameters in the `theme_iom` function. By default, 
+#these parameters are set to `TRUE`, which turns on all the axis titles and 
+# text. Using `axis_title = FALSE` removes both X and Y axis titles,
+# `axis_title = "X"` adds only the X axis title, `axis_title = "Y"` adds 
+# only the Y axis title, and `axis_title = TRUE` adds all axis titles. 
+# Similarly, `axis_text = TRUE` adds both X and Y axis text, `axis_text = "X"`
+# adds only the X axis text, `axis_text = "Y"` adds only the Y axis text,
+#and `axis_text = FALSE` removes all axis text. 
+
+#For example, let's keep only the Y axis title:
+ 
+ggplot(
+  data = df,
+  aes(x = date, y = val, fill = set)
+) +
+  geom_col(
+    position = position_stack(reverse = TRUE),
+    width = 0.8
+  ) +
+  labs(
+    title = "My title | 2010-2020",
+    subtitle = "My subtitle",
+    y = "values",
+    caption = "Source: Dummy data"
+  ) +
+  scale_y_continuous(
+    expand = expansion(c(0, 0.01))
+  ) +
+  theme_iom(
+    grid = "Y",
+    axis = "X",
+    axis_title = "Y" # Only Y axis title
+  )
+#
+### Axis ticks
+
+#Axis ticks can sometimes be useful. To control the visibility of axis ticks,
+# you can use the `axis_ticks` parameter in the `theme_iom` function.
+# By default, this parameter is set to `FALSE`, which turns off all the 
+# axis ticks. Using `axis_ticks = TRUE` adds both X and Y axis ticks, 
+# `axis_ticks = "X"` adds only the X axis ticks, `axis_ticks = "Y"` adds only
+# the Y axis ticks, and `axis_ticks = FALSE` removes all axis ticks.
+
+## Text
+
+# Like all the chart elements, the different text elements, such as the 
+# plot title, subtitle, caption, and more, can be controlled using the
+# `theme_iom` function. We encourage you, not to touch any of these parameters,
+# as they are part of IOM branding and should be used as is. 
+# However, you can still adjust the font size, font family, margin or 
+#justification of each of these elements using, for example,
+#the `plot_title_size`, `plot_title_margin`, etc. parameters.
+
+#On top of the `theme_iom` parameters, the `{iomthemes}` package natively 
+# incorporates the `{ggtext}` package for advanced text rendering in the title,
+# subtitle and caption components. To showcase this, you can use the `{ggtext}` 
+# functionalities to include styled text directly in your plots.
+ 
+ggplot(
+  data = df,
+  aes(x = date, y = val, fill = set)
+) +
+  geom_col(
+    position = position_stack(reverse = TRUE),
+    width = 0.8
+  ) +
+  labs(
+    # Add some HTML style to the title
+    title = "My title including
+             <span style='color:#0033A0;'>highlight color</span> | 2010-2020",
+    # Automatic wrapping of long text
+    subtitle = "My really long subtitle that will cover more than one line and
+                that will be automatically wrapped thanks to ggtext so I don't
+                have to manually put a line break",
+    y = "values",
+    # Line break in the caption, use <br> instead of \n
+    caption = "Note: As it's HTML text the line break symbol is not
+               '\\n'<br>Source: Dummy data"
+  ) +
+  scale_y_continuous(
+    expand = expansion(c(0, 0.01))
+  ) +
+  theme_iom(
+    grid = "Y",
+    axis = "X",
+    axis_title = "Y"
+  )
+
+### Add text labels
+
+#Text labels added with `geom_text` will also display using the recommended 
+# font and style.
+ 
+ggplot(
+  data = df,
+  aes(x = date, y = val, fill = set)
+) +
+  geom_col(
+    position = position_stack(reverse = TRUE),
+    width = 0.8
+  ) +
+  # Add geom_text
+  geom_text(aes(label = scales::number_format(accuracy = 0.1)(val)),
+    position = position_stack(vjust = 0.5, reverse = TRUE),
+    show.legend = FALSE
+  ) +
+  labs(
+    title = "My title including
+             <span style='color:#0033A0;'>highlight color</span> | 2010-2020",
+    subtitle = "My really subtitle that will cover more than one line and that
+                will be automatically wrapped thanks to ggtext so I don't have 
+                to manually put a line break",
+    y = "values",
+    caption = "Note: As it's HTML text the line break symbol is
+              not '\\n'<br>Source: Dummy data"
+  ) +
+  scale_y_continuous(
+    expand = expansion(c(0, 0.01))
+  ) +
+  theme_iom(
+    grid = "Y",
+    axis = "X",
+    axis_title = "Y"
+  )
+
+
+## Void
+
+# To simplify the creation of pie/donut charts or maps, the `theme_iom` function
+# comes with a `void` parameter. When set to `TRUE`, this parameter removes 
+# all grid lines, ticks, and axes. For example, let's create a pie chart:
+
+ggplot(
+  data = dplyr::filter(df, date == 2020),
+  aes(x = date, y = val, fill = set)
+) +
+  geom_col(
+    position = position_stack(reverse = TRUE),
+    width = 0.8
+  ) +
+  labs(
+    title = "My title | 2020",
+    subtitle = "My subtitle",
+    y = "values",
+    caption = "Source: Dummy data"
+  ) +
+  scale_fill_iom_d() +
+  coord_polar(
+    theta = "y",
+    direction = -1
+  ) +
+  theme_iom(
+    void = TRUE # Remove all grid lines, ticks, and axes
+  )
+
+```
+  
+```{r tests-theme_iom}
+test_that("theme_iom works", {
+  expect_true(inherits(theme_iom, "function")) 
+})
+```
+  
+## update_geom_font_defaults
+    
+```{r function-update_geom_font_defaults}
+#' Update matching font defaults for text geoms
+#'
+#' Updates [ggplot2::geom_label] and [ggplot2::geom_text] font defaults
+#' @importFrom ggrepel GeomTextRepel GeomLabelRepel
+#'
+#' @param family Font family, default "Lato".
+#' @param face Font face, default "plain".
+#' @param size font size in mm.
+#' @param color Font color, default "#1a1a1a".
+#'
+#' @noRd
+#' @export
+update_geom_font_defaults <- function(
+    family = if (package_font_installed()) "Open Sans" else "sans",
+    face = "plain",
+    size = 3.5,
+    color = "#1a1a1a") {
+  ggplot2::update_geom_defaults(
+    "text",
+    list(family = family, face = face, size = size, color = color)
+  )
+  ggplot2::update_geom_defaults(
+    "label",
+    list(family = family, face = face, size = size, color = color)
+  )
+  # ggplot2::update_geom_defaults(
+  #   "text_repel",
+  #   list(family = family, face = face, size = size, color = color)
+  # )
+  # ggplot2::update_geom_defaults(
+  #   "label_repel",
+  #   list(family = family, face = face, size = size, color = color)
+  # )
+}
+```
+  
+```{r example-update_geom_font_defaults}
+update_geom_font_defaults()
+```
+  
+```{r tests-update_geom_font_defaults}
+test_that("update_geom_font_defaults works", {
+  expect_true(inherits(update_geom_font_defaults, "function")) 
+})
+```
+    
+# Font
+
+## package_font_installed
+    
+```{r function-package_font_installed}
+#' Check if Open Sans font family is installed in the system
+#'
+#' Verify if you have Open Sans font installed in your system
+#'
+#' @importFrom systemfonts system_fonts
+#' @importFrom extrafont loadfonts
+#'
+#' @returns TRUE if Open Sans is installed in the system
+#' @export
+#' @noRd
+package_font_installed <- function() { 
+  extrafont::loadfonts(device = "win"  , quiet = TRUE)  # For Windows
+  extrafont::loadfonts(device = "pdf", quiet = TRUE)  # For PDF output
+  suppressMessages(extrafont::loadfonts())
+  sys_fonts <- systemfonts::system_fonts()
+  any(grepl("Open Sans", sys_fonts$family, ignore.case = TRUE))
+  
+}
+```
+  
+```{r example-package_font_installed}
+test <- systemfonts::system_fonts() |>
+             dplyr::filter(  family == "Open Sans"  )
+package_font_installed()
+```
+  
+```{r tests-package_font_installed}
+test_that("package_font_installed works", {
+  expect_true(inherits(package_font_installed, "function")) 
+})
+```
+
+## package_font_import
+    
+```{r function-package_font_import}
+#' Import Open Sans font
+#'
+#' Import Open Sans font for use in R graphic devices
+#'
+#' @importFrom systemfonts register_font
+#' @importFrom extrafont font_import
+#'
+#' @return No return value, called for side effects
+#' @export
+#' @noRd
+package_font_import <- function() {
+  if (!package_font_installed()) {
+    font_dir <- system.file("fonts", "OpenSans",
+      package = "iomthemes"
+    )
+    systemfonts::register_font(
+      name = "OpenSans",
+      plain = file.path(font_dir, "OpenSans-Regular.ttf"),
+      italic = file.path(font_dir, "OpenSans-Italic.ttf"),
+      bold = file.path(font_dir, "OpenSans-Bold.ttf"),
+      bolditalic = file.path(
+        font_dir,
+        "OpenSans-BoldItalic.ttf"
+      )
+    )
+    pattern <- "(?i)OpenSans-(regular|bold|italic|bolditalic)"
+    suppressMessages(extrafont::font_import(font_dir,
+      pattern = pattern,
+      prompt = FALSE
+    ))
+    suppressMessages(extrafont::loadfonts())
+  } else {
+    font_dir <- systemfonts::system_fonts()
+    b <- grepl("Open Sans", font_dir$family, ignore.case = TRUE)
+    font_dir <- font_dir[b, ]
+    font_dir <- unique(dirname(font_dir$path))
+    pattern <- "(?i)OpenSans-(regular|bold|italic|bolditalic)"
+    suppressMessages(extrafont::font_import(font_dir,
+      pattern = pattern,
+      prompt = FALSE
+    ))
+    suppressMessages(extrafont::loadfonts())
+  }
+  update_geom_font_defaults()
+}
+```
+  
+```{r example-package_font_import}
+test <- systemfonts::system_fonts() |>
+             dplyr::filter(  family == "Open Sans"  )
+package_font_import()
+```
+  
+```{r tests-package_font_import}
+test_that("package_font_import works", {
+  expect_true(inherits(package_font_import, "function")) 
+})
+```
+  
+## package_font_registered
+
+```{r function-package_font_registered}
+#' Check if Open Sans font is registered through \code{extrafont}
+#'
+#' Verify if Open Sans is registered through \code{extrafont}
+#'
+#' @importFrom systemfonts system_fonts
+#' @importFrom extrafont fonts
+#'
+#' @returns TRUE if OpenSans is registered
+#' @export
+#' @noRd
+package_font_registered <- function() {
+  any(grepl("Open Sans", extrafont::fonts(), ignore.case = TRUE))
+  suppressMessages(extrafont::loadfonts())
+}
+```
+  
+```{r example-package_font_registered}
+package_font_registered()
+```
+  
+```{r tests-package_font_registered}
+test_that("package_font_registered works", {
+  expect_true(inherits(package_font_registered, "function")) 
+})
+```
+    
+
+      
+
+# Color Palette  
+
+## iom_pal_display_all
+    
+```{r function-iom_pal_display_all}
+#' IOM color palettes viewer
+#'
+#' Displays a set of the color palettes from IOM color
+#'
+#' @param n Number of different colors in the palette, minimum depending on 
+#'    the palette (2), maximum depending on the palette (5, 7 or 10)
+#' @param type Type of the palette, can be "sequential", "diverging", "qualitative" or "all"
+#'
+#' @importFrom graphics par plot rect text
+#'
+#' @return No return value, called for side effects
+#'
+#' @export
+#' @noRd
+iom_pal_display_all <- function(n = NULL, type = "all") {
+  iomcolors <- iomcolors[nrow(iomcolors):1, ]
+  if (any(type == "all")) {
+    selected_type <- iomcolors
+  } else if (any(type %in% c("qualitative", "sequential", "diverging"))) {
+    selected_type <- iomcolors[iomcolors$type %in% type, ]
+  } else {
+    stop(paste(type, "is not a valid name for a color type\n"))
+  }
+  selected_metadata <- iomcolors[iomcolors$name %in% selected_type$name, ]
+
+  n_colors <- nrow(selected_metadata)
+
+  if (is.null(n)) {
+    my_n <- selected_metadata$max_n
+  } else {
+    my_n <- rep(n, n_colors)
+  }
+
+  selected_colors <- vector("list", n_colors)
+
+  ylim <- c(0, n_colors)
+  oldpar <- par(
+    mgp = c(2, 0.25, 0),
+    pty = "s",
+    mar = c(0, 0, 0, 0)
+  )
+  on.exit(par(oldpar))
+  max_my_n <- max(my_n)
+  plot(1, 1,
+    xlim = c(-1.5, max_my_n), ylim = ylim,
+    type = "n", axes = FALSE, bty = "n", xlab = "", ylab = ""
+  )
+
+  for (i in seq_len(n_colors)) {
+    one_color <- iom_pal(
+      n = my_n[i],
+      name = selected_metadata$name[i]
+    )
+    rect(
+      xleft = 0:(my_n[i] - 1),
+      ybottom = i - 1,
+      xright = 1:my_n[i],
+      ytop = i - 0.2,
+      col = one_color,
+      border = "light grey"
+    )
+    text(-0.1, i - 0.6,
+      labels = selected_metadata$name[i],
+      xpd = TRUE,
+      adj = 1
+    )
+  }
+}
+```
+  
+```{r example-iom_pal_display_all}
+library(iomthemes)
+
+# Display all iom color palette
+iom_pal_display_all()
+
+# Display all IOM color palette with filters
+iom_pal_display_all(type = "diverging")
+iom_pal_display_all(type = c("diverging", "qualitative", "sequential"))
+iom_pal_display_all(n = 3, type = "sequential")
+iom_pal_display_all(n = 5, type = "sequential")
+```
+  
+```{r tests-iom_pal_display_all}
+test_that("iom_pal_display_all works", {
+  expect_true(inherits(iom_pal_display_all, "function")) 
+})
+```
+  
+  
+## iom_pal_display
+    
+```{r function-iom_pal_display}
+#' IOM color palette viewer
+#'
+#' Displays a color palette from IOM brand color
+#'
+#' @param n Number of different colors in the palette, minimum depending on
+#'    palette (2), maximum depending on palette (5, 7 or 10)
+#' @param name A palette name
+#'
+#' @importFrom graphics image
+#'
+#' @return No return value, called for side effects
+#'
+#' @noRd
+#'
+#' @export
+iom_pal_display <- function(n = NULL, name) {
+  selected_colors <- iom_pal(n, name)
+  selected_type <- iomcolors[iomcolors$name == name, ][["type"]][[1]]
+  image(1:n, 1, as.matrix(1:n),
+    col = selected_colors,
+    main = paste0(name, ": ", selected_type, " (", n, ")"),
+    xlab = " ", ylab = " ", xaxt = "n", yaxt = "n", bty = "n"
+  )
+}
+```
+  
+```{r example-iom_pal_display}
+# Or select a specific one and limit the number of colors
+iom_pal_display(3, "pal_iom")
+```
+  
+```{r tests-iom_pal_display}
+test_that("iom_pal_display works", {
+  expect_true(inherits(iom_pal_display, "function")) 
+})
+```
+
+
+## iom_pal_name
+    
+```{r function-iom_pal_name}
+#' Retrieve the name of a color palette
+#'
+#' This function returns the name of a color palette based on the specified 
+#'  palette number and type.
+#'
+#' @param palette Integer or character. The palette number or name.
+#' @param type Character. The type of palette.
+#' @return A character string representing the name of the color palette.
+#' @noRd
+#' @export
+iom_pal_name <- function(palette, type) {
+  if (is.character(palette)) {
+    if (!palette %in% iomcolors$name) {
+      warning("Unknown palette ", palette)
+      palette <- "pal_blue"
+    }
+    return(palette)
+  }
+  type <- match.arg(type, unique(iomcolors$type))
+  iomcolors$name[iomcolors$type == type][palette]
+}
+```
+  
+```{r example-iom_pal_name}
+#iom_pal_name()
+```
+  
+```{r tests-iom_pal_name}
+test_that("iom_pal_name works", {
+  expect_true(inherits(iom_pal_name, "function")) 
+})
+```
+  
+ 
+## iom_pal_scale
+    
+```{r function-iom_pal_scale}
+#' Generate a color palette function
+#'
+#' This function creates a color palette function based on the specified type, 
+#' palette, and direction.
+#' It supports qualitative palettes and allows customization of the maximum 
+#' number of colors and their order.
+#'
+#' @param type Character. The type of palette. Default is "qualitative".
+#' @param nmax Integer. The maximum number of colors. Default is NULL.
+#' @param order Integer vector. The order of colors. Default is NULL.
+#' @param palette Integer. The palette number. Default is 1.
+#' @param direction Integer. The direction of the palette.
+#'                  1 for normal, -1 for reversed. 
+#'                  Default is 1.
+#' @return A function that generates a color palette of length `n`.
+#' @noRd
+#' @export
+iom_pal_scale <- function(type = "qualitative",
+                            nmax = NULL, order = NULL,
+                            palette = 1, direction = 1) {
+  pal <- iom_pal_name(palette, type)
+
+  function(n) {
+    if (is.null(nmax) | type != "qualitative") {
+      nmax <- n
+    }
+    if (is.null(order) | type != "qualitative") {
+      order <- 1:n
+    }
+
+    if (n > nmax) {
+      warning("Insufficient values in scale_{color|fill}_iom_d. ",
+        n, " needed but only ",
+        nmax, " provided.",
+        call. = FALSE
+      )
+    }
+
+    # If <3 colors are requested, brewer.pal will return a 3-color palette and
+    # give a warning. This warning isn't useful, so suppress it.
+    # If the palette has k colors and >k colors are requested, brewer.pal will
+    # return a k-color palette and give a warning. This warning is useful, so
+    # don't suppress it.
+    if (nmax < 3) {
+      pal <- suppressWarnings(iom_pal(nmax, pal))
+    } else {
+      pal <- iom_pal(nmax, pal)
+    }
+
+    # In both cases ensure we have n items
+    pal <- pal[order]
+
+    if (direction == -1) {
+      pal <- rev(pal)
+    }
+
+    unname(pal)
+  }
+}
+```
+  
+```{r example-iom_pal_scale}
+#iom_pal_scale()
+```
+  
+```{r tests-iom_pal_scale}
+test_that("iom_pal_scale works", {
+  expect_true(inherits(iom_pal_scale, "function")) 
+})
+```
+   
+
+## iom_pal
+    
+```{r function-iom_pal}
+#' IOM Color Palettes
+#'
+#' Creates a color palette from IOM branding.
+#'
+#' @param n Integer. Number of different colors in the palette. 
+#'   Minimum depends on the palette (2),
+#'  maximum depends on the palette (5, 7, or 10). 
+#'  If `NULL`, the maximum number of colors for the palette is used.
+#' @param name Character. A palette name from the IOM branding.
+#' 
+#'   we have:
+#'    -  2 qualitative palettes - `pal_iom` and `pal_iom_region`
+#'    -  5 sequential palettes - `pal_blue`, `pal_navy`, `pal_green`,
+#'                               `pal_red`, `pal_yellow`, `pal_grey`
+#'    - 2 diverging palette - `pal_blue_red` & `pal_navy_rev`
+#'   
+#'             
+#' 
+#' @param ... Additional arguments passed to [grDevices::colorRampPalette].
+#'
+#' @return A character vector of hex color codes representing the palette.
+#'
+#' @details This function generates a color palette based on the specified
+#'          IOM branding palette name.
+#' If the number of colors `n` is not within the valid range for
+#'     the palette, warnings are issued and the closest valid number of 
+#'     colors is used.
+#' @export
+iom_pal <- function(n = NULL, name, ...) {
+  # Check if the provided palette name is valid
+  if (!(name %in% iomcolors$name)) {
+    stop(paste(name, "is not a valid palette name\n"), call. = FALSE)
+  }
+  
+  # Retrieve metadata for the selected palette
+  selected_metadata <- iomcolors[iomcolors$name == name, ]
+  min_n <- selected_metadata$min_n
+  max_n <- selected_metadata$max_n
+  type <- selected_metadata$type
+  
+  # Use the maximum number of colors if n is not specified
+  if (is.null(n)) {
+    n <- max_n
+  }
+  
+  # Ensure the number of colors is within the valid range
+  proper_n <- n
+  if (proper_n > max_n) {
+    proper_n <- max_n
+  }
+  
+  # Issue warnings if the number of colors is not within the valid range for qualitative palettes
+  if (!(n %in% min_n:max_n) && type == "qualitative") {
+    warning(paste("Number of colors (n) in the", name, "palette should be between", min_n, "and", max_n, "\n"), call. = FALSE)
+  }
+  
+  # Adjust the number of colors if it is below the minimum
+  if (n < min_n) {
+    warning(paste("Number of colors (n) in the", name, "palette should be between", min_n, "and", max_n, "\n"), call. = FALSE)
+    proper_n <- min_n
+    n <- min_n
+  }
+  
+  # Retrieve the color codes for the specified number of colors
+  coln <- paste0("n", proper_n)
+  colors <- iomcolors[iomcolors$name == name, ][[coln]][[1]]
+  
+  # Generate a color ramp if more than 2 colors are requested
+  if (n > 2) {
+    colors <- grDevices::colorRampPalette(colors, ...)(n = n)
+  }
+  
+  colors
+}
+
+```
+  
+```{r example-iom_pal}
+# Display all IOM color palette with filters
+
+# Qualitative Palette:
+# When to Use: Use a qualitative palette when you have categorical data,
+# meaning data that represents different groups or categories without any
+# inherent order.
+# Example: Different colors for different countries
+iom_pal_display_all(type = "qualitative")
+iom_pal(n =3, "pal_iom")
+
+# Sequential Palette:
+# When to Use: Use a sequential palette when you have numerical data that
+# progresses from low to high. This type of palette shows a gradient of 
+# colors, usually from light to dark.
+#Example: Temperature changes over a year, population density, or income levels.
+iom_pal_display_all(n = 3, type = "sequential")
+iom_pal_display_all(n = 5, type = "sequential")
+iom_pal(3, "pal_blue")
+iom_pal(5, "pal_navy")
+iom_pal(12, "pal_red")
+
+# Diverging Palette:
+# When to Use: Use a diverging palette when you have numerical data with a 
+# meaningful midpoint, such as zero, and you want to show variation on both 
+# sides of this midpoint.
+# Example: Anomalies (deviations from a norm),
+# survey responses ranging from negative to positive.
+# for diverging palette, you can not get more than 9 different colors
+iom_pal_display_all(type = "diverging")
+```
+  
+```{r tests-iom_pal}
+test_that("iom_pal works", {
+  expect_true(inherits(iom_pal, "function")) 
+})
+```
+  
+# Color Scaling 
+
+## scale_color_iom_c
+    
+```{r function-scale_color_iom_c}
+#' IOM ggplot2 color scales
+#' 
+#' Color scales help differentiate between data points, making it easier to 
+#' identify patterns, trends, and outliers.
+#' 
+#' You will need to select the right type of color scale depending on your data
+#' 
+#'  * Discrete Color Scales:scale_..._iom_d -  Use these when you have 
+#'     categorical data  and that require a qualitative color palette. 
+#'  * Continuous Color Scales: scale_..._iom_c -Use these for numerical data 
+#'that progresses from low to high and that require a sequential color palette. 
+#'  * Diverging Color Scales: scale_..._iom_b - Use these when you have data 
+#'     with a meaningful midpoint and that require a diverging color palette.  
+#'     
+#'  depending on the geometry use, either fill or color - or a combination    
+#'
+#' @inheritParams scales::gradient_n_pal
+#' @inheritParams ggplot2::continuous_scale
+#' @inheritParams ggplot2::discrete_scale
+#'
+#' @param palette If a string, will use that named palette. 
+#'    it can be any of the IOM brandied palettes: 
+#'    -  2 qualitative palettes - `pal_iom` and `pal_iom_region`
+#'    -  5 sequential palettes - `pal_blue`, `pal_navy`, `pal_green`,
+#'                               `pal_red`, `pal_yellow`, `pal_grey`
+#'    - 2 diverging palette - `pal_blue_red` & `pal_navy_rev`
+#'    
+#'    If a number, will
+#'   index into the list of palettes of appropriate `type`
+#' @param direction Sets the order of colors in the scale. If 1, the default,
+#'   colors are as output by [iom_pal()]. If -1, the order of colors is reversed
+#' @param nmax Maximum number of different colors the palette should contain. 
+#'    If not provided, is calculated automatically
+#'  from the data.
+#' @param order Numeric vector listing the order in which the colors should be 
+#'    used. Default is \code{1:nmax}.
+#' @param ... Other arguments passed on to [discrete_scale()] or
+#' [continuous_scale()] to control name, limits, breaks, labels and so forth
+#'
+#' @importFrom scales gradient_n_pal
+#'
+#' @return A discrete, continuous or binned `Scale` object
+#'
+#' @rdname iom_scale
+#' @export
+scale_color_iom_c <- function(..., 
+                                palette = 1,
+                                direction = 1,
+                                na.value = "#E9E9E9", 
+                                guide = "colourbar") {
+  pal <- iom_pal_scale(
+    type =  "sequential",
+    palette = palette,
+    direction = direction
+  )(256)
+
+  continuous_scale("colour",
+    "iom_continuous",
+    gradient_n_pal(pal),
+    na.value = na.value,
+    guide = guide,
+    ...
+  )
+}
+
+#' @rdname iom_scale
+#' @export
+scale_color_iom_d <- function(...,  
+                                palette = 1,
+                                direction = 1,
+                                nmax = NULL,
+                                order = NULL,
+                                na.value = "#E9E9E9") {
+  pal <- iom_pal_scale(
+    type = "qualitative",
+    palette = palette,
+    nmax = nmax,
+    order = order,
+    direction = direction
+  )
+
+  discrete_scale("colour",
+    "iom_discrete",
+    pal,
+    na.value = na.value,
+    ...
+  )
+}
+
+#' @rdname iom_scale
+#' @export
+scale_color_iom_b <- function(...,  
+                                palette = 1,
+                                direction = 1,
+                                nmax = NULL,
+                                order = NULL,
+                                na.value = "#E9E9E9",
+                                guide = "coloursteps") {
+  pal <- binned_pal(iom_pal_scale(
+    type = "qualitative",
+    palette = palette,
+    nmax = nmax,
+    order = order,
+    direction = direction
+  ))
+
+  binned_scale("colour",
+    "iom_binned",
+    pal,
+    na.value = na.value,
+    guide = guide,
+    ...
+  )
+}
+
+#' @rdname iom_scale
+#' @aliases scale_color_iom_c
+#' @export
+scale_colour_iom_c <- scale_color_iom_c
+
+#' @rdname iom_scale
+#' @aliases scale_color_iom_d
+#' @export
+scale_colour_iom_d <- scale_color_iom_d
+
+#' @rdname iom_scale
+#' @aliases scale_color_iom_b
+#' @export
+scale_colour_iom_b <- scale_color_iom_b
+
+#' @rdname iom_scale
+#' @export
+scale_fill_iom_c <- function(...,  
+                               palette = 1,
+                               direction = 1,
+                               na.value = "#E9E9E9",
+                               guide = "colourbar") {
+  pal <- iom_pal_scale(
+    type = "sequential",
+    palette = palette,
+    direction = direction
+  )(256)
+
+  continuous_scale("fill",
+    "iom_continuous",
+    gradient_n_pal(pal),
+    na.value = na.value,
+    guide = guide,
+    ...
+  )
+}
+
+#' @rdname iom_scale
+#' @export
+scale_fill_iom_d <- function(...,  
+                               palette = 1,
+                               direction = 1,
+                               nmax = NULL,
+                               order = NULL,
+                               na.value = "#E9E9E9") {
+  pal <- iom_pal_scale(
+    type = "qualitative",
+    palette = palette,
+    nmax = nmax,
+    order = order,
+    direction = direction
+  )
+
+  discrete_scale("fill",
+    "iom_discrete",
+    pal,
+    na.value = na.value,
+    ...
+  )
+}
+
+#' @rdname iom_scale
+#' @export
+scale_fill_iom_b <- function(...,  
+                               palette = 1,
+                               direction = 1,
+                               nmax = NULL,
+                               order = NULL,
+                               na.value = "#E9E9E9",
+                               guide = "coloursteps") {
+  pal <- binned_pal(iom_pal_scale(
+    type = "qualitative",
+    palette = palette,
+    nmax = nmax,
+    order = order,
+    direction = direction
+  ))
+
+  binned_scale("fill",
+    "iom_binned",
+    pal,
+    na.value = na.value,
+    guide = guide,
+    ...
+  )
+}
+
+
+```
+  
+```{r example-scale_color_iom_c}
+library(ggplot2)
+library(iomthemes)
+
+
+# Discrete Color Scales:scale_..._iom_d -  Use these when you have 
+#     categorical data  and that require a qualitative color palette. 
+
+df <- data.frame(
+  date = factor(rep(2010:2020, 2)),
+  val = c(
+    10.2, 10.2, 10.2, 11.5, 14,
+    15.8, 17, 19.5, 20.5, 24.5, 20.6,
+    4.9, 4.9, 4.9, 5.5, 5.5, 5.6,
+    5.6, 5.7, 5.7, 5.8, 5.9
+  ),
+  set = rep(c("Set 1", "Set 2"), each = 11)
+)
+ggplot(
+  data = df,
+  aes(x = date, y = val, fill = set)
+) +
+  geom_col(
+    position = position_stack(reverse = TRUE),
+    width = 0.8
+  ) +
+  labs(
+    title = "My title including 
+              <span style='color:#0033A0;'>highlight color</span> | 2010-2020",
+    subtitle = "My really subtitle that will cover more than one line and
+              that will be automatically wrapped thanks to ggtext so I don't 
+              have to manually put a line break",
+    y = "values",
+    caption = "Note: As it's HTML text the line break symbol is
+               not '\\n'<br>Source: Dummy data"
+  ) +
+  scale_y_continuous(
+    expand = expansion(c(0, 0.01))
+  ) +
+  scale_fill_iom_d() +
+  theme_iom(
+    grid = "Y",
+    axis = "X",
+    axis_title = "Y"
+  )
+
+# Continuous Color Scales: scale_..._iom_c -Use these for numerical data that progresses
+#  from low to high and that require a sequential color palette. 
+
+# Diverging Color Scales: scale_..._iom_b - Use these when you have data 
+# 'with a meaningful midpoint and that require a diverging color palette. 
+```
+  
+```{r tests-scale_color_iom_c}
+test_that("scale_color_iom_c works", {
+  expect_true(inherits(scale_color_iom_c, "function")) 
+})
+```
+
+## binned_pal
+    
+```{r function-binned_pal}
+#' Create a binned color palette function
+#'
+#' This function generates a binned color palette function that applies the 
+#'    given palette function to the length of the input vector.
+#'
+#' @param palette Function. A function that generates a color palette.
+#' @return A function that takes a vector `x` and returns a color palette of 
+#'        the same length as `x`.
+#' @noRd
+#' @export
+binned_pal <- function(palette) {
+  function(x) {
+    palette(length(x))
+  }
+}
+```
+  
+```{r example-binned_pal}
+binned_pal()
+```
+  
+```{r tests-binned_pal}
+test_that("binned_pal works", {
+  expect_true(inherits(binned_pal, "function")) 
+})
+```
+  
+
+# Utilities
+
+## annotate_gadget
+ 
+ 
+A shinyGadget to add annotation to a ggplot2!..
+ 
+Based on https://github.com/MattCowgill/ggannotate 
+also inspired from https://community.rstudio.com/t/graph-annotator-shiny-contest-submission/104687
+ 
+Once the button "Position the annotation on the chart" is launched:
+ 
+- a window with the chart -
+ 
+- click first time to indicate the top-left point to position the infobox
+- ask if an arrow is required - if no - the windows closed and the annotation is added - 
+- if yes - click a second time to add the arrow pointer - then window closed and the annotation is added- - a button is added with the option to remove this annotation -
+- user can click the 
+```{r function-annotate_gadget}
+#' A ShinyGadget to simply overlay an annotation on a ggplot2 chart
+#'
+#'  See https://shiny.posit.co/r/articles/build/gadgets/
+#'  https://shiny.posit.co/r/articles/build/gadget-ui/
+#'  https://posit.co/resources/videos/building-interactive-tools-for-exploratory-data-analysis/
+#'  https://posit.co/resources/videos/introducing-shiny-gadgets-interactive-tools/
+#'  https://stackoverflow.com/questions/30527977/ggplot2-how-to-differentiate-click-from-brush
+#'
+#' @param chart the ggplot2 object...
+#' @param viewer Specify where the gadget should be displayed–viewer pane, dialog window, or external browser–by passing in a call to one of the viewer() functions.
+#' @return the code snippet wit the annoation
+#' @importFrom miniUI miniPage gadgetTitleBar miniContentPanel miniButtonBlock
+#' @importFrom ggtext geom_textbox
+#' @importFrom stringr str_wrap
+#' @import ggplot2
+#' @import shiny
+#' @noRd 
+#' @keywords internal
+#' @export
+annotate_gadget <- function(chart, viewer=paneViewer()) {
+  ui <- miniUI::miniPage(
+    miniUI::gadgetTitleBar("Overlay your interpretation on the chart!"),
+    miniUI::miniContentPanel(
+      shiny::textAreaInput(inputId="annot",
+                           label= "First Add your text",
+                #            placeholder = "Use double quote on your text and
+                # \\n special character to add carriage return on the text in the plot",
+                           width = '100%'),
+      "Then POSITION:  One first single click on the plot to point what you would like
+      to highlight and then a long brush click to draw the box where the annotation
+      should be overlaid",
+      shiny::plotOutput("plot",
+                        height = "60%",
+                        width = "80%",
+                        click="annotate_point",
+                        brush= shiny::brushOpts(id="annotate_box")) #,
+     # shiny::verbatimTextOutput("info", placeholder = TRUE )
+      ) #,
+    # miniUI::miniButtonBlock(
+    #   shiny::actionButton("reset",
+    #                       label = "Click here to reset the positionning",
+    #                       border = "bottom",
+    #                       icon = shiny::icon("arrow-up-right-from-square"))
+    # )
+  )
+  server <- function(input, output, session) {
+    # Initialize reactive values
+    r <- reactiveValues(x = 0,
+                        y = 0,
+                        xmax = 0,
+                        ymax = 0,
+                        xmin = 0,
+                        ymin = 0,
+                        xbox = 0,
+                        ybox = 0,
+                        arrowcurve = 0.3,
+                        arrowangle = 140,
+                        annot = " ",
+                        xcentroid = 0,
+                        ycentroid = 0,
+                        chart = chart)
+    ## Observe Point
+    observeEvent(input$annot,
+                 handlerExpr = {
+                   r$annot = input$annot }
+    )
+    ## Observe Point
+    observeEvent(input$annotate_point,
+                 handlerExpr = {
+                   r$x = input$annotate_point$x
+                   r$y = input$annotate_point$y }
+    )
+    ## Observer Brush o define the attachment point
+    observeEvent(input$annotate_box,
+                 handlerExpr = {
+       r$xmax <- input$annotate_box$xmax  
+       r$xmin <- input$annotate_box$xmin  
+       r$ymax <- input$annotate_box$ymax  
+       r$ymin <- input$annotate_box$ymin 
+       ## Position based on centroid of the box
+       r$xcentroid = r$xmin #+ (r$xmax - r$xmin)/2
+       r$ycentroid = r$ymin + (r$ymax - r$ymin)/2
+       ## Now adjust the point to link the box to arrow
+       r$xbox = r$xmin - (r$xmax - r$xmin)*0.1
+       r$ybox = r$ycentroid 
+       if(r$ybox > r$ycentroid) {r$arrowcurve = -.3} else { r$arrowcurve = .3 }
+       if(r$ybox > r$ycentroid) {r$arrowangle = 240} else { r$arrowangle = 140 }
+                 }
+    )
+    # browser()
+    # Render the plot
+    output$plot <- shiny::renderPlot({
+      ## get everything ready - text, point and box - then redraw the chart
+      if( r$x > 0 & r$xcentroid > 0 ){
+        r$chart <- chart +
+          ## Annotation
+          ggplot2::annotate(
+            geom = "text",
+            x = r$xcentroid,
+            y = r$ycentroid, 
+            #label =  r$annot  ,
+            label = stringr::str_wrap(r$annot,20) ,
+            # hjust and vjust make the reference point the lower left corner of your text
+            hjust = 0, vjust = 0.5,
+            color = "grey50",  
+            size = 4, 
+            #fontface = "bold",
+            lineheight = .9) +
+          ## Arrow
+          ggplot2::annotate(
+            geom = "curve",
+            x = r$xbox,
+            y = r$ybox, 
+            xend = r$x, 
+            yend = r$y,
+            angle = r$arrowangle,
+            curvature = r$arrowcurve, 
+            color = "grey50",  
+            arrow = ggplot2::arrow(
+              length = ggplot2::unit(12, "pt"),
+              type = "closed", ends = "last")  )
+         }
+       r$chart 
+    })
+    ## Get the parameters to add to the ggplot object to render this annotation
+     output$code <- shiny::renderText({
+      result <-  c(
+         annot = r$annot,
+         xcentroid = r$xcentroid,
+         ycentroid = r$ycentroid,
+         xbox = r$xbox,
+         ybox = r$ybox,
+         x = r$x,
+         y = r$y)
+      result
+     })
+ 
+     output$info <- shiny::renderText({
+        paste0(" Text box coordinates: ",
+               "\n  - xmin: ",  r$xmin,
+               " / ymin: ", r$ymin,
+               "\n  - xmax: ", r$xmax,
+               " / ymax: ", r$ymax ,
+               "\n  - xcentroid: ", r$xcentroid,
+               " / ycentroid: ", r$ycentroid ,
+               "\n Arrow pointer oordinates:",
+               "\n  - x: ", r$x, " / y: ", r$y,
+               "\n  - xbox: ", r$xbox, " / ybox: ", r$ybox)
+     })
+    ## Observe Reset
+    observeEvent(input$reset, handlerExpr = {
+      ## Center of the label
+      r$xmin <-  0
+      r$ymin <-  0
+      r$xmax <-  0
+      r$ymax  <-  00
+      r$xcentroid <-  0
+      r$ycentroid  <-  0
+      ## Begin arrow0
+      r$xbox <-  0
+      r$ybox <-  0
+      ## End arrow
+      r$x <-  0
+      r$y <-  0
+    })
+    # Handle the Done button being pressed.
+    observeEvent(input$done, {
+      # Return the code that will be used in the rest of the app...
+      stopApp(
+        output$info
+        )
+    })
+  }
+  shiny::runGadget(ui, server)
+}
+```
+
+```{r example-annotate_gadget}
+# if (interactive())
+# Load packages
+library(ggplot2)
+library(iomthemes)
+
+# A dummy data frame
+df <- data.frame(
+  date = factor(rep(2010:2020, 2)),
+  val = c(
+    10.2, 10.2, 10.2, 11.5, 14,
+    15.8, 17, 19.5, 20.5, 24.5, 20.6,
+    4.9, 4.9, 4.9, 5.5, 5.5, 5.6,
+    5.6, 5.7, 5.7, 5.8, 5.9
+  ),
+  set = rep(c("Set 1", "Set 2"), each = 11)
+)
+
+# Base plot with theme_iom()
+thischart <- ggplot(  data = df,
+                      aes(x = date, y = val, fill = set)) +
+  geom_col(
+    position = position_stack(reverse = TRUE),
+    width = 0.8
+  ) +
+  labs(
+    title = "My title | 2010-2020",
+    subtitle = "My subtitle",
+    x = "date",
+    y = "values",
+    caption = "Source: Dummy data"
+  ) +
+  theme_iom()
+
+ 
+#annotate_gadget(chart = thischart, viewer=paneViewer())
+ 
+```
+
+```{r tests-annotate_gadget}
+test_that("annotate_gadget works", {
+  expect_true(inherits(annotate_gadget, "function")) 
+})
+```
+
+
+# Inflate
+<!--
+# There can be development actions
+
+Create a chunk with 'development' actions
+
+- The chunk needs to be named `development` or `dev`
+- It contains functions that are used for package development only
+- Note that you may want to store most of these functions in the 0-dev_history.Rmd file
+
+These are only included in the present flat template file, their content will not be part of the package anywhere else.
+-->
+
+
+Inflate your package
+
+```{r development-inflate, eval=FALSE}
+# Keep eval=FALSE to avoid infinite loop in case you hit the knit button
+# Execute in the console directly3
+
+fusen::inflate(flat_file = "dev/fusen_dev.Rmd", vignette_name = NA)
+#fusen::inflate(flat_file = "dev/fusen_dev.Rmd", vignette_name = "Development")
+```
+
+You're one inflate from paper to box.
+Build your package from this very Rmd using `fusen::inflate()`
+
+- Verify your `"DESCRIPTION"` file has been updated
+- Verify your function is in `"R/"` directory
+- Verify your test is in `"tests/testthat/"` directory
+- Verify this Rmd appears in `"vignettes/"` directory
