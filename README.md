@@ -38,8 +38,12 @@ pak::pkg_install("iom/iomthemes")
 ## Usage
 
 After loading the `{iomthemes}` package, you can apply the theme to any
-`{ggplot2}` chart, by simply adding the palette & the color scaling
-functions and `theme_iom()` at the end of your plot.
+`{ggplot2}` chart, by simply either adding a [specific color from one
+the palette](https://iom.github.io/iomthemes/reference/iom_pal.html) or
+use one of the [color scaling
+functions](https://iom.github.io/iomthemes/reference/iom_scale.html) and
+[`theme_iom()`](https://iom.github.io/iomthemes/reference/theme_iom.html)
+at the end of your plot.
 
 Below is an example using the excel demo dataset from UNDESA bundled
 within the package.
@@ -84,7 +88,7 @@ readxl::read_excel(system.file(
   # Define it as a bar chart and apply IOM color palette
   geom_bar(stat = "identity",
            ## Apply IOM color palette!
-           fill = iomthemes::iom_pal(n = 1, "pal_blue"),
+           fill = iomthemes::iom_pal(n = 1, name= "pal_blue"),
            width = 0.8) +
   # Flip the chart to make it more legible
   coord_flip()  +

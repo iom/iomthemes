@@ -9,12 +9,14 @@ main_grey = "#666666"
 main_yellow = "#FFB81C"
 alt_yellow = "#FF671F"
 
+second_blue = "#418FDE"
+
 pal_blue_iom <- c(
-  "blue1" = colorspace::lighten(main_blue, 0.85),
-  "blue2" = colorspace::lighten(main_blue, 0.55),
-  "blue3" = colorspace::lighten(main_blue, 0.3),
-  "blue4" = main_blue,
-  "blue5" = colorspace::darken(main_blue, 0.3)
+  "blue1" = colorspace::lighten(second_blue, 0.75),
+  "blue2" = colorspace::lighten(second_blue, 0.50),
+  "blue3" = colorspace::lighten(second_blue, 0.3),
+  "blue4" = second_blue,
+  "blue5" = colorspace::darken(second_blue, 0.3)
 )
 
 pal_navy_iom <- c(
@@ -59,7 +61,7 @@ pal_yellow_iom <- c(
   "yellow5" = alt_yellow
 )
 
-pal_main <- c(pal_blue_iom["blue4"], pal_blue_iom["blue2"],
+pal_main <- c(main_blue, pal_blue_iom["blue2"],
               pal_navy_iom["navy5"], pal_navy_iom["navy3"],
               pal_green_iom["green4"], pal_green_iom["green2"],
               pal_grey_iom["grey4"], pal_grey_iom["grey2"],
