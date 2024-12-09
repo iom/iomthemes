@@ -161,6 +161,12 @@ file.sex.destination.origin <- system.file(
                                            package = "iomthemes")
 
 data.sex.destination.origin <- readxl::read_excel(file.sex.destination.origin,
+  col_types = c("numeric", "text", "text","numeric", "text",
+                "text", "numeric",
+                "numeric","numeric", "numeric", "numeric","numeric","numeric",
+                "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", 
+                "numeric","numeric", "numeric", "numeric", "numeric", "numeric",
+                "numeric","numeric", "numeric" ), 
                                           sheet = "Table 1", skip = 9) |>
   ## Getting clean variable names
   janitor::clean_names() |>

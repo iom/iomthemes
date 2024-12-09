@@ -1,13 +1,10 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# `{iomthemes}`
+## Overview
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/elegoupil/iomthemes/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/elegoupil/iomthemes/actions/workflows/R-CMD-check.yaml)
-[![Codecov test
-coverage](https://codecov.io/gh/elegoupil/iomthemes/graph/badge.svg)](https://app.codecov.io/gh/elegoupil/iomthemes)
 <!-- badges: end -->
 
 The [International Organisation for Migration](http://iom.int) is part
@@ -57,6 +54,12 @@ library(iomthemes)
 readxl::read_excel(system.file(
   "undesa_pd_2020_ims_stock_by_sex_destination_and_origin.xlsx",
                                            package = "iomthemes"),
+  col_types = c("numeric", "text", "text","numeric", "text",
+               "text", "numeric",
+              "numeric","numeric", "numeric", "numeric","numeric","numeric",
+              "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", 
+              "numeric","numeric", "numeric", "numeric", "numeric", "numeric",
+              "numeric","numeric", "numeric" ), 
   sheet = "Table 1", skip = 9) |>
   ## Getting clean variable names
   janitor::clean_names() |>
@@ -103,8 +106,8 @@ readxl::read_excel(system.file(
                 migration | 2020",
        x = "Country of Origin",
        y = "Total Migrants (2020)",
-       caption = "Source: United Nations Department of Economic and Social Affairs,
-            Population Division. International Migrant Stock (2020)") +
+       caption = "Source: United Nations Department of Economic and Social 
+       Affairs, Population Division. International Migrant Stock (2020)") +
   ## and apply IOM theme
   iomthemes::theme_iom(grid = "X", axis = "Y", axis_title = "X")
 ```
@@ -131,7 +134,8 @@ submit an [issue on GitHub](https://github.com/iom/iomthemes/issues).
 To contribute code, do not hesitate to fork the repository and create a
 pull request. Note that the package is maintained with [Fusen
 package](https://thinkr-open.github.io/fusen/). All functions are
-document in `dev/fusen_dev.Rmd`
+document in
+[`dev/fusen_dev.Rmd`](https://github.com/iom/iomthemes/blob/master/dev/fusen_dev.Rmd).
 
 ## License
 
