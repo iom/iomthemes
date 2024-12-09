@@ -8,9 +8,11 @@
 [![R-CMD-check](https://github.com/elegoupil/iomthemes/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/elegoupil/iomthemes/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
 coverage](https://codecov.io/gh/elegoupil/iomthemes/graph/badge.svg)](https://app.codecov.io/gh/elegoupil/iomthemes)
-<!-- badges: end --> The [International Organisation for
-Migration](http://iom.int) is part of the United Nations System. The
-organisation supports three main strategic objectives:
+<!-- badges: end -->
+
+The [International Organisation for Migration](http://iom.int) is part
+of the United Nations System. The organisation supports three main
+strategic objectives:
 
 1.  Saving lives and protecting people on the move,
 
