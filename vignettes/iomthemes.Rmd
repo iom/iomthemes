@@ -690,7 +690,7 @@ ggplot(combined_data, aes(x = ageclass, y = per)) +
                           sex=="male."  ),
            aes(  y = - per),
            #alpha =0.6,
-           fill = iom_pal(n = 1, "pal_navy"),
+           fill = iom_pal(n = 1, "pal_un"),
            stat = "identity") +
   geom_segment(data = combined_data |>
              filter(population == "Local" &
@@ -722,7 +722,7 @@ ggplot(combined_data, aes(x = ageclass, y = per)) +
   scale_y_continuous(labels = abs)+
   annotate("text", y = -.04, x = 17, label = "Male",
            size = 12 / .pt,  
-           hjust = 1, color = iom_pal(n = 1, "pal_navy")) +
+           hjust = 1, color = iom_pal(n = 1, "pal_un")) +
   annotate("text", y = .04, x = 17, label = "Female",
            size = 12 / .pt,  
            hjust = 0, color = iom_pal(n = 1, "pal_blue")) +

@@ -2,45 +2,44 @@ library(colorspace)
 library(usethis)
 
 main_blue = "#0033A0"
-main_navy = "#18375F"
+main_un =  "#418FDE"
 main_green = "#5CB8B2"
 main_red = "#D22630"
 main_grey = "#666666"
 main_yellow = "#FFB81C"
 alt_yellow = "#FF671F"
 
-second_blue = "#418FDE"
 
 pal_blue_iom <- c(
-  "blue1" = colorspace::lighten(second_blue, 0.75),
-  "blue2" = colorspace::lighten(second_blue, 0.50),
-  "blue3" = colorspace::lighten(second_blue, 0.3),
-  "blue4" = second_blue,
-  "blue5" = colorspace::darken(second_blue, 0.3)
+  "blue1" = "#0033AD",
+  "blue2" = "#4066B8",
+  "blue3" = "#8099D0",
+  "blue4" = "#B3C2E3",
+  "blue5" = "#D9E0F1"
 )
 
-pal_navy_iom <- c(
-  "navy1" = colorspace::lighten(main_navy, 0.9),
-  "navy2" = colorspace::lighten(main_navy, 0.75),
-  "navy3" = colorspace::lighten(main_navy, 0.5),
-  "navy4" = colorspace::lighten(main_navy, 0.25),
-  "navy5" = main_navy
+pal_un_iom <- c(
+  "un1" = "#418FDE",
+  "un2" = "#84ADEC",
+  "un3" = "#ADC9F2",
+  "un4" = "#CEDEF7",
+  "un5" = "#E6EFFB"
 )
 
 pal_green_iom <- c(
-  "green1" = colorspace::lighten(main_green, 0.9),
-  "green2" = colorspace::lighten(main_green, 0.55),
-  "green3" = colorspace::lighten(main_green, 0.3),
-  "green4" = main_green,
-  "green5" = colorspace::darken(main_green, 0.3)
+  "green1" = "#5CB8B2",
+  "green2" = "#85CAC5",
+  "green3" = "#AEDCD9",
+  "green4" = "#CEEAE8",
+  "green5" = "#E7F4F3"
 )
 
 pal_red_iom <- c(
-  "red1" = colorspace::lighten(main_red, 0.85),
-  "red2" = colorspace::lighten(main_red, 0.6),
-  "red3" = colorspace::lighten(main_red, 0.3),
-  "red4" = main_red,
-  "red5" = colorspace::darken(main_red, 0.3)
+  "red1" = "#D22630",
+  "red2" = "#DD5C64",
+  "red3" = "#E99398",
+  "red4" = "#F2BEC1",
+  "red5" = "#F8DEE0"
 )
 
 pal_grey_iom <- c(
@@ -52,33 +51,48 @@ pal_grey_iom <- c(
 )
 
 pal_yellow_iom <- c(
-  "yellow1" = colorspace::lighten(main_yellow, 0.7),
-  "yellow2" = colorspace::lighten(main_yellow, 0.4),
-  "yellow3" = main_yellow,
-  "yellow4" = hex(colorspace::mixcolor(0.4,
-                                       hex2RGB(main_yellow),
-                                       hex2RGB(alt_yellow))),
-  "yellow5" = alt_yellow
+  "yellow1" = "#FFB81C",
+  "yellow2" = "#FFCA55",
+  "yellow3" = "#FFDC8E",
+  "yellow4" = "#FFEABB",
+  "yellow5" = "#FFF4DD"
 )
 
+pal_orange_iom <- c(
+  "orange1" = "#FF671F",
+  "orange2" = "#FF8D57",
+  "orange3"= "#FFB38F",
+  "orange4" = "#FFD1BC",
+  "orange5" = "#FFE8DD")
+
 pal_main <- c(main_blue, pal_blue_iom["blue2"],
-              pal_navy_iom["navy5"], pal_navy_iom["navy3"],
+              pal_un_iom["un5"], pal_un_iom["un3"],
               pal_green_iom["green4"], pal_green_iom["green2"],
               pal_grey_iom["grey4"], pal_grey_iom["grey2"],
               pal_red_iom["red4"], pal_red_iom["red2"])
 
+pal_iom_region <- c(
+  "Central and North America and Caribbean"="#82ABEB",
+  "South America"="#FDA880",
+  "West and Central Africa"="#FDC854",
+  "European Economic Area"="#A1C0F0",
+  "Middle East & North Africa"="#DB5A63",
+  "Southern Africa"="#E3838A",
+  "East and The Horn of Africa"="#A1D5D3",
+  "Asia and the Pacific"="#A1D5D3",
+  "South-Eastern Europe, Eastern Europe and Central Asia"="#FD8B56")
 
 
 iomcolors <- tibble::tibble(name = c("pal_iom",
                                        "pal_iom_region",
                                        "pal_blue",
-                                       "pal_navy",
+                                       "pal_un",
                                        "pal_green",
                                        "pal_red",
                                        "pal_yellow",
                                        "pal_grey",
                                        "pal_blue_red",
-                                       "pal_navy_red"),
+                                       "pal_un_red"),
                               type = c(rep("qualitative", 2),
                                        rep("sequential", 6),
                                        rep("diverging", 2)),
@@ -90,7 +104,7 @@ iomcolors <- tibble::tibble(name = c("pal_iom",
                               n1 = list(pal_main[1],
                                         pal_blue_iom[4],
                                         pal_blue_iom[4],
-                                        pal_navy_iom[5],
+                                        pal_un_iom[5],
                                         pal_green_iom[4],
                                         pal_red_iom[4],
                                         pal_yellow_iom[3],
@@ -99,39 +113,39 @@ iomcolors <- tibble::tibble(name = c("pal_iom",
                               n2 = list(pal_main[1:2],
                                         pal_blue_iom[4:3],
                                         c(pal_blue_iom[2], pal_blue_iom[4]),
-                                        c(pal_navy_iom[3], pal_navy_iom[5]),
+                                        c(pal_un_iom[3], pal_un_iom[5]),
                                         c(pal_green_iom[2], pal_green_iom[4]),
                                         c(pal_red_iom[2], pal_red_iom[4]),
                                         c(pal_yellow_iom[3], pal_yellow_iom[4]),
                                         c(pal_grey_iom[2], pal_grey_iom[4]),
                                         c(pal_blue_iom[4], pal_red_iom[4]),
-                                        c(pal_navy_iom[5], pal_red_iom[4])),
+                                        c(pal_un_iom[5], pal_red_iom[4])),
                               n3 = list(c(pal_main[3], pal_main[1:2]),
                                         pal_blue_iom[4:2],
                                         pal_blue_iom[2:4],
-                                        pal_navy_iom[3:5],
+                                        pal_un_iom[3:5],
                                         pal_green_iom[2:4],
                                         pal_red_iom[2:4],
                                         pal_yellow_iom[3:5],
                                         pal_grey_iom[2:4],
                                         c(pal_blue_iom[4], pal_grey_iom[1], pal_red_iom[4]),
-                                        c(pal_navy_iom[5], pal_grey_iom[1], pal_red_iom[4])),
+                                        c(pal_un_iom[5], pal_grey_iom[1], pal_red_iom[4])),
                               n4 = list(c(pal_main[3], pal_main[1:2], pal_main[5]),
-                                        c(pal_blue_iom[4:2], pal_navy_iom[5]),
+                                        c(pal_blue_iom[4:2], pal_un_iom[5]),
                                         pal_blue_iom[2:5],
-                                        pal_navy_iom[2:5],
+                                        pal_un_iom[2:5],
                                         pal_green_iom[2:5],
                                         pal_red_iom[2:5],
                                         pal_yellow_iom[2:5],
                                         pal_grey_iom[2:5],
                                         c(pal_blue_iom[4], pal_blue_iom[2],
                                           pal_red_iom[2], pal_red_iom[4]),
-                                        c(pal_navy_iom[5], pal_navy_iom[3],
+                                        c(pal_un_iom[5], pal_un_iom[3],
                                           pal_red_iom[2], pal_red_iom[4])),
                               n5 = list(c(pal_main[3], pal_main[1:2], pal_main[5], pal_main[7]),
-                                        c(pal_blue_iom[4:2], pal_navy_iom[5], pal_green_iom[4]),
+                                        c(pal_blue_iom[4:2], pal_un_iom[5], pal_green_iom[4]),
                                         pal_blue_iom[1:5],
-                                        pal_navy_iom[1:5],
+                                        pal_un_iom[1:5],
                                         pal_green_iom[1:5],
                                         pal_red_iom[1:5],
                                         pal_yellow_iom[1:5],
@@ -139,35 +153,35 @@ iomcolors <- tibble::tibble(name = c("pal_iom",
                                         c(pal_blue_iom[4], pal_blue_iom[2],
                                           pal_grey_iom[1],
                                           pal_red_iom[2], pal_red_iom[4]),
-                                        c(pal_navy_iom[5], pal_navy_iom[3],
+                                        c(pal_un_iom[5], pal_un_iom[3],
                                           pal_grey_iom[1],
                                           pal_red_iom[2], pal_red_iom[4])),
                               n6 = list(c(pal_main[1:5], pal_main[7]),
-                                        c(pal_blue_iom[4:2], pal_navy_iom[5], pal_green_iom[4],
+                                        c(pal_blue_iom[4:2], pal_un_iom[5], pal_green_iom[4],
                                           pal_yellow_iom[4]),
                                         NULL, NULL, NULL,
                                         NULL, NULL, NULL,
                                         c(pal_blue_iom[4:2],  pal_red_iom[2:4]),
-                                        c(pal_navy_iom[5:3], pal_red_iom[2:4])),
+                                        c(pal_un_iom[5:3], pal_red_iom[2:4])),
                               n7 = list(pal_main[1:7],
-                                        c(pal_blue_iom[4:2], pal_navy_iom[5], pal_green_iom[4],
+                                        c(pal_blue_iom[4:2], pal_un_iom[5], pal_green_iom[4],
                                           pal_yellow_iom[4], pal_red_iom[4]),
                                         NULL, NULL, NULL,
                                         NULL, NULL, NULL,
                                         c(pal_blue_iom[4:2],  pal_grey_iom[1], pal_red_iom[2:4]),
-                                        c(pal_navy_iom[5:3], pal_grey_iom[1], pal_red_iom[2:4])),
+                                        c(pal_un_iom[5:3], pal_grey_iom[1], pal_red_iom[2:4])),
                               n8 = list(pal_main[1:8],
                                         NULL,
                                         NULL, NULL, NULL,
                                         NULL, NULL, NULL,
                                         c(pal_blue_iom[5:2], pal_red_iom[2:5]),
-                                        c(pal_navy_iom[5:2], pal_red_iom[2:5])),
+                                        c(pal_un_iom[5:2], pal_red_iom[2:5])),
                               n9 = list(pal_main[1:9],
                                         NULL,
                                         NULL, NULL, NULL,
                                         NULL, NULL, NULL,
                                         c(pal_blue_iom[5:2], pal_grey_iom[1], pal_red_iom[2:5]),
-                                        c(pal_navy_iom[5:2], pal_grey_iom[1], pal_red_iom[2:5])),
+                                        c(pal_un_iom[5:2], pal_grey_iom[1], pal_red_iom[2:5])),
                               n10 = list(pal_main,
                                          NULL,
                                          NULL, NULL, NULL,
