@@ -14,6 +14,8 @@ BugReports: https://github.com/iom/iomthemes/issues
 Depends:
     R (>= 3.5)
 Imports:
+    cli,
+    dplyr,
     extrafont,
     ggplot2,
     ggrepel,
@@ -29,7 +31,6 @@ Imports:
 Suggests:
     classInt,
     countrycode,
-    dplyr,
     ggstream,
     janitor,
     knitr,

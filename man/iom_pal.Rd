@@ -17,7 +17,7 @@ If \code{NULL}, the maximum number of colors for the palette is used.}
 we have:
 \itemize{
 \item 2 qualitative palettes - \code{pal_iom} and \code{pal_iom_region}
-\item 5 sequential palettes - \code{pal_blue}, \code{pal_navy}, \code{pal_green},
+\item 5 sequential palettes - \code{pal_blue}, \code{pal_un}, \code{pal_green},
 \code{pal_red}, \code{pal_yellow}, \code{pal_grey}
 \item 2 diverging palette - \code{pal_blue_red} & \code{pal_navy_rev}
 }}
@@ -56,7 +56,7 @@ iom_pal(n =3, "pal_iom")
 iom_pal_display_all(n = 3, type = "sequential")
 iom_pal_display_all(n = 5, type = "sequential")
 iom_pal(3, "pal_blue")
-iom_pal(5, "pal_navy")
+iom_pal(5, "pal_un")
 iom_pal(12, "pal_red")
 
 # Diverging Palette:

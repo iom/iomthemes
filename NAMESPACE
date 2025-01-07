@@ -2,6 +2,7 @@
 
 export(annotate_gadget)
 export(binned_pal)
+export(countryname)
 export(iom_pal)
 export(iom_pal_display)
 export(iom_pal_display_all)

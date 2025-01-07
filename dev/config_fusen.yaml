@@ -4,6 +4,7 @@ fusen_dev.Rmd:
   R:
   - R/annotate_gadget.R
   - R/binned_pal.R
+  - R/countryname.R
   - R/iom_pal.R
   - R/iom_pal_display.R
   - R/iom_pal_display_all.R
@@ -28,6 +29,7 @@ fusen_dev.Rmd:
   - tests/testthat/test-iom_pal.R
   - tests/testthat/test-iom_scale.R
   - tests/testthat/test-binned_pal.R
+  - tests/testthat/test-countryname.R
   - tests/testthat/test-annotate_gadget.R
   vignettes: []
   inflate:

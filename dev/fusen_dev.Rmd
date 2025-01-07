@@ -1193,7 +1193,7 @@ test_that("iom_pal_scale works", {
 #' 
 #'   we have:
 #'    -  2 qualitative palettes - `pal_iom` and `pal_iom_region`
-#'    -  5 sequential palettes - `pal_blue`, `pal_navy`, `pal_green`,
+#'    -  5 sequential palettes - `pal_blue`, `pal_un`, `pal_green`,
 #'                               `pal_red`, `pal_yellow`, `pal_grey`
 #'    - 2 diverging palette - `pal_blue_red` & `pal_navy_rev`
 #'   
@@ -1277,7 +1277,7 @@ iom_pal(n =3, "pal_iom")
 iom_pal_display_all(n = 3, type = "sequential")
 iom_pal_display_all(n = 5, type = "sequential")
 iom_pal(3, "pal_blue")
-iom_pal(5, "pal_navy")
+iom_pal(5, "pal_un")
 iom_pal(12, "pal_red")
 
 # Diverging Palette:
@@ -1598,6 +1598,151 @@ test_that("binned_pal works", {
 
 # Utilities
 
+## countryname
+
+
+    
+```{r function-countryname}
+#' Toggle between country names, ISO codes and IOM Regions
+#'
+#' @description Easily convert a country name to its ISO code and vice versa.
+#'   Official United Nations country names are used. See `countrynames` for full
+#'   dictionary.
+#'
+#' @details Under the default `exact = FALSE`, matching is done using
+#'   `stringr::str_detect`, which means keys need not be exact. For example,
+#'   `countryname("iran", from = "name", to = "iso3)` will return the correct
+#'   ISO code "IRN" even if the dictionary name is "Islamic Republic of Iran".
+#'   One can therefore check a country's official name by running
+#'   `countryname("iran", from = "name")`.
+#'
+#'   If there are multiple matches, `countryname()` will only return the first
+#'   match. Thus, while "guinea" matches with four countries (Equatorial Guinea,
+#'   Guinea, Guinea-Bissau, Papua New Guinea), `countryname("guinea")` will only
+#'   return the keys for Equatorial Guinea, which is a problem if one wants to
+#'   obtain the keys for Guinea. Set `exact = TRUE` to use exact matching.
+#'
+#'   Regardless of how `exact` is set, matching remains case-insensitive,
+#'
+#' @param key (Case-insensitive) name or ISO code of country.
+#' @param from Current type of `key`.
+#' @param to Target type of `key`.
+#' @param exact Whether to use exact matching.
+#' @param quiet Turn off warning messages.
+#'
+#' @return String or vector of strings.
+#' @export
+countryname <- function(key,
+                        from = "iso3",
+                        to = "name",
+                        exact = FALSE,
+                        quiet = FALSE) {
+
+  # Check if types are valid
+  valid_types <- colnames(countrynames)
+  if(!all(c(from, to) %in% valid_types)) {
+    invalid <- c()
+    if (!(from %in% valid_types)) {
+      invalid <- c(invalid, paste0('"', from, '"'))
+    }
+    if (!(to %in% valid_types)) {
+      invalid <- c(invalid, paste0('"', to, '"'))
+    }
+    if (length(invalid) > 1) {
+      invalid <- paste(
+        paste(invalid, collapse = " and "),
+        "are not valid types."
+      )
+    } else {
+      invalid <- paste(invalid, "is not a valid type.")
+    }
+    cli::cli_abort("{invalid}")
+  }
+
+  out <- c()
+  multi <- data.frame()
+  nohits <- c()
+
+  for (k in key) {
+
+    from_col <- countrynames[{from}] |> unlist() |> unname()
+    to_col <- countrynames[{to}] |> unlist() |> unname()
+
+    if (exact) {
+      row <- which(tolower(from_col) == tolower(k))
+    } else {
+      row <- which(
+        stringr::str_detect(tolower(from_col),
+        paste0("\\b", tolower(k), "\\b"))
+      )
+    }
+    hit <- to_col[row]
+
+    if (length(hit) == 0) {
+      nohits <- c(nohits, paste0('"', k, '"'))
+      out <- c(out, NA)
+    }
+    else {
+      if (length(hit) > 1) {
+        multi <- multi |>
+          rbind(data.frame(
+            key = paste0('"', k, '"'),
+            hit = paste0('"', hit[1], '"')
+          ))
+      }
+      out <- c(out, hit[1])
+    }
+  }
+
+  if (!quiet & nrow(multi) > 0) {
+    multi <- multi |> dplyr::distinct(key, .keep_all = TRUE)
+    warn <- c()
+    for (row in 1:nrow(multi)) {
+      warn <- c(warn, "*" = paste0(multi$key[row], " = ", multi$hit[row]))
+    }
+    cli::cli_warn(c(
+      'The following had multiple matches and only the first was returned. For more control over matching, set `exact = TRUE`.',
+      warn
+    ))
+  }
+
+  if (length(nohits) > 0) {
+    if (!quiet) cli::cli_warn(c(
+      'Unable to parse the following (returned NA) :',
+      "*" = '{paste(unique(nohits), collapse = ", ")}'
+    ))
+  }
+
+  return(out)
+}
+```
+  
+```{r example-countryname}
+# Default export a series of country code to country name
+countryname(c("deu", "phl"))
+
+# Country name to Country code
+countryname("germany", from = "name", to = "iso3")
+
+# Country name to IOM region that matches the specific color palette pal_region
+countryname("germany", from = "name", to = "iom.region")
+
+# testing multiple match and  exact = TRUE
+countryname("guinea", from = "name")
+
+countryname("guinea", from = "name", exact = TRUE)
+
+# names to full names
+countryname("united kingdom", from = "name")
+```
+  
+```{r tests-countryname}
+test_that("countryname works", {
+  expect_true(inherits(countryname, "function")) 
+})
+```
+  
+
 ## annotate_gadget
  
  
@@ -1614,6 +1759,7 @@ Once the button "Position the annotation on the chart" is launched:
 - ask if an arrow is required - if no - the windows closed and the annotation is added - 
 - if yes - click a second time to add the arrow pointer - then window closed and the annotation is added- - a button is added with the option to remove this annotation -
 - user can click the 
+
 ```{r function-annotate_gadget}
 #' A ShinyGadget to simply overlay an annotation on a ggplot2 chart
 #'
@@ -1625,7 +1771,7 @@ Once the button "Position the annotation on the chart" is launched:
 #'
 #' @param chart the ggplot2 object...
 #' @param viewer Specify where the gadget should be displayed–viewer pane, dialog window, or external browser–by passing in a call to one of the viewer() functions.
-#' @return the code snippet wit the annoation
+#' @return the code snippet wit the annotation
 #' @importFrom miniUI miniPage gadgetTitleBar miniContentPanel miniButtonBlock
 #' @importFrom ggtext geom_textbox
 #' @importFrom stringr str_wrap
@@ -1827,7 +1973,7 @@ thischart <- ggplot(  data = df,
   theme_iom()
 
  
-#annotate_gadget(chart = thischart, viewer=paneViewer())
+#out <- annotate_gadget(chart = thischart, viewer=paneViewer())
  
 ```
 

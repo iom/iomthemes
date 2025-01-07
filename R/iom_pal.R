@@ -12,7 +12,7 @@
 #' 
 #'   we have:
 #'    -  2 qualitative palettes - `pal_iom` and `pal_iom_region`
-#'    -  5 sequential palettes - `pal_blue`, `pal_navy`, `pal_green`,
+#'    -  5 sequential palettes - `pal_blue`, `pal_un`, `pal_green`,
 #'                               `pal_red`, `pal_yellow`, `pal_grey`
 #'    - 2 diverging palette - `pal_blue_red` & `pal_navy_rev`
 #'   
@@ -47,7 +47,7 @@
 #' iom_pal_display_all(n = 3, type = "sequential")
 #' iom_pal_display_all(n = 5, type = "sequential")
 #' iom_pal(3, "pal_blue")
-#' iom_pal(5, "pal_navy")
+#' iom_pal(5, "pal_un")
 #' iom_pal(12, "pal_red")
 #'
 #' # Diverging Palette:

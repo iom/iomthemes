@@ -157,7 +157,7 @@ ggplot(
 #and `grid = FALSE` removes all grid lines. 
 # You can add minor grid lines by using lowercase `"xy"`, `"x"` or `"y"`. 
 
-#For example, letb
+#For example, let’s keep only the major Y grid lines:
  
 ggplot(
   data = df,
@@ -223,7 +223,7 @@ ggplot(
 # **Modify the axis expansion:**
 # 
 # In this example, we will set the `expand` argument to `expansion(c(0, 0.01))` 
-# for the y axis to remove the unwanted space, effectively b
+# for the y axis to remove the unwanted space, effectively “expanding” the axis
 # by removing the space at the axis origin and adding a small padding 
 # at the other end.
 

@@ -9,8 +9,8 @@
 #'  https://stackoverflow.com/questions/30527977/ggplot2-how-to-differentiate-click-from-brush
 #'
 #' @param chart the ggplot2 object...
-#' @param viewer Specify where the gadget should be displayedb
-#' @return the code snippet wit the annoation
+#' @param viewer Specify where the gadget should be displayed–viewer pane, dialog window, or external browser–by passing in a call to one of the viewer() functions.
+#' @return the code snippet wit the annotation
 #' @importFrom miniUI miniPage gadgetTitleBar miniContentPanel miniButtonBlock
 #' @importFrom ggtext geom_textbox
 #' @importFrom stringr str_wrap
@@ -54,7 +54,7 @@
 #'   theme_iom()
 #'
 #'  
-#' #annotate_gadget(chart = thischart, viewer=paneViewer())
+#' #out <- annotate_gadget(chart = thischart, viewer=paneViewer())
 #'  
 annotate_gadget <- function(chart, viewer=paneViewer()) {
   ui <- miniUI::miniPage(

@@ -229,7 +229,7 @@ data.age.sex.destination.mig <-   readxl::read_excel(file.age.sex.destination,
     "total.age.40_44"="x40_44_15", "total.age.45_49"="x45_49_16",
     "total.age.50_54"="x50_54_17", "total.age.55_59"="x55_59_18",
     "total.age.60_64"="x60_64_19", "total.age.65_69"="x65_69_20",
-    "total.age.70_74"="x70_74_21", "total.age.75+"="x75_22",
+    "total.age.70_74"="x70_74_21", "total.age.75"="x75_22",
     "total.age.all"="total_23",
     
     ## Male
@@ -240,7 +240,7 @@ data.age.sex.destination.mig <-   readxl::read_excel(file.age.sex.destination,
     "male.age.40_44"="x40_44_32", "male.age.45_49"="x45_49_33",
     "male.age.50_54"="x50_54_34","male.age.55_59"="x55_59_35",
     "male.age.60_64"="x60_64_36", "male.age.65_69"="x65_69_37",
-    "male.age.70_74"="x70_74_38","male.age.75+"="x75_39",
+    "male.age.70_74"="x70_74_38","male.age.75"="x75_39",
     "male.age.all"="total_40",
     
     ## Female
@@ -251,7 +251,7 @@ data.age.sex.destination.mig <-   readxl::read_excel(file.age.sex.destination,
     "female.age.40_44"="x40_44_49", "female.age.45_49"= "x45_49_50",
     "female.age.50_54"="x50_54_51", "female.age.55_59"="x55_59_52",
     "female.age.60_64"="x60_64_53", "female.age.65_69"="x65_69_54",
-    "female.age.70_74"="x70_74_55","female.age.75+"= "x75_56",
+    "female.age.70_74"="x70_74_55","female.age.75"= "x75_56",
     "female.age.all"="total_57")|>
   ## Provide legible labels for Data Source
   dplyr::mutate ( type_data_label = dplyr::recode(type_of_data,
@@ -285,7 +285,7 @@ data.age.sex.destination.loc <-   readxl::read_excel(file.age.sex.destination,
     "total.age.40_44"="x40_44_15", "total.age.45_49"="x45_49_16",
     "total.age.50_54"="x50_54_17", "total.age.55_59"="x55_59_18",
     "total.age.60_64"="x60_64_19", "total.age.65_69"="x65_69_20",
-    "total.age.70_74"="x70_74_21", "total.age.75+"="x75_22",
+    "total.age.70_74"="x70_74_21", "total.age.75"="x75_22",
     "total.age.all"="total_23",
     
     ## Male
@@ -296,7 +296,7 @@ data.age.sex.destination.loc <-   readxl::read_excel(file.age.sex.destination,
     "male.age.40_44"="x40_44_32", "male.age.45_49"="x45_49_33",
     "male.age.50_54"="x50_54_34","male.age.55_59"="x55_59_35",
     "male.age.60_64"="x60_64_36", "male.age.65_69"="x65_69_37",
-    "male.age.70_74"="x70_74_38","male.age.75+"="x75_39",
+    "male.age.70_74"="x70_74_38","male.age.75"="x75_39",
     "male.age.all"="total_40",
     
     ## Female
@@ -307,7 +307,7 @@ data.age.sex.destination.loc <-   readxl::read_excel(file.age.sex.destination,
     "female.age.40_44"="x40_44_49", "female.age.45_49"= "x45_49_50",
     "female.age.50_54"="x50_54_51", "female.age.55_59"="x55_59_52",
     "female.age.60_64"="x60_64_53", "female.age.65_69"="x65_69_54",
-    "female.age.70_74"="x70_74_55","female.age.75+"= "x75_56",
+    "female.age.70_74"="x70_74_55","female.age.75"= "x75_56",
     "female.age.all"="total_57") |>
   ## Provide legible labels for Data Source
   ## Provide legible labels for Data Source
@@ -416,7 +416,8 @@ p <- data |>
   coord_flip()  +
   ## Format the labels for the x axis
   scale_y_continuous(
-    labels = scales::label_number(scale_cut = scales::cut_short_scale())   ) +
+    labels = scales::label_number(scale_cut = scales::cut_short_scale()),
+                      expand = expansion(c(0, 0.01))     ) +
   labs(
     title = "Main Countries of Migrant Origin",
     subtitle = "Highlighting the top 10 countries contributing to global
@@ -492,7 +493,8 @@ p <- data |>
   coord_flip()  +
   scale_fill_iom_d(direction = -1) +
   scale_y_continuous(
-    labels = scales::label_number(scale_cut = scales::cut_short_scale())  ) +
+    labels = scales::label_number(scale_cut = scales::cut_short_scale()),
+                      expand = expansion(c(0, 0.01))    ) +
   ## Define the plot title formatted so the color reflects the legend
   labs(title =  paste0(
          "Migrant Population Growth by Region: <span style='color:",
@@ -594,7 +596,8 @@ p <- top_10_data |>
        x = "Country of Destination",
        y = "Total Migrants",
        fill = "Region of Origin") +
-    scale_y_continuous(  labels = scales::label_number(scale_cut = scales::cut_short_scale()) ) +
+    scale_y_continuous(  labels = scales::label_number(scale_cut = scales::cut_short_scale()),
+                      expand = expansion(c(0, 0.01))   ) +
   scale_fill_viridis_d(  option ="cividis"  ) +
   theme_iom(
     grid = "X", axis = "Y", axis_title = "X",
@@ -648,7 +651,7 @@ combined_data <- bind_rows(migrant , local ) |>
 
   #"e.0_4"  "e.5_9"   "e.10_14" "e.20_24" "e.25_29" "e.30_34"
   # "e.35_39" "e.40_44" "e.45_49"  "e.50_54"
-#"e.55_59" "e.60_64" "e.65_69" "e.70_74" "e.75+"
+#"e.55_59" "e.60_64" "e.65_69" "e.70_74" "e.75"
 mutate(ageclass = case_when( str_detect(age_group, "e.0_4") ~ "0-4",
                              str_detect(age_group, "e.5_9") ~ "5-9",
                              str_detect(age_group, "e.10_14") ~ "10-14",
@@ -664,13 +667,13 @@ mutate(ageclass = case_when( str_detect(age_group, "e.0_4") ~ "0-4",
                              str_detect(age_group, "e.60_64") ~ "60-64",
                              str_detect(age_group, "e.65_69") ~ "65-69",
                              str_detect(age_group, "e.70_74") ~ "70-74",
-                             str_detect(age_group, "e.75+") ~ "75+"),
+                             str_detect(age_group, "e.75") ~ "75"),
        ageclass= factor(ageclass , levels = c(
          "0-4",  "5-9", "10-14",
          "15-19",  "20-24",  "25-29",
           "30-34",  "35-39",  "40-44",
           "45-49",  "50-54", "55-59",
-         "60-64",  "65-69",  "70-74",  "75+")))
+         "60-64",  "65-69",  "70-74",  "75")))
 ```
 
 **Plot:**
@@ -1045,7 +1048,8 @@ ggplot(global_remittance_data, aes(x = year, y = total_remittances)) +
     by nonresident entities. 
     Source: World bank Data - Indicator BX.TRF.PWKR.CD.DT") + 
   #scale_x_discrete( breaks = scales::pretty_breaks(n = 5)   ) +
-  scale_y_continuous( labels = scales::label_number(scale_cut = scales::cut_short_scale())) +
+  scale_y_continuous( labels = scales::label_number(scale_cut = scales::cut_short_scale()),
+                      expand = expansion(c(0, 0.01))  ) +
   theme_iom(grid = "Y", axis = "X", axis_title = FALSE)
 ```
 
@@ -1752,7 +1756,7 @@ ggplot(complete_data, aes(x = year,
             size = 3, n_grid = 100 ) +
  # scale_x_discrete( breaks = scales::pretty_breaks(n = 5)) +
   scale_y_continuous( labels = scales::label_number(scale_cut = scales::cut_short_scale())) +
-  labs(title = "Most international migration do orginate from Asia!",
+  labs(title = "Most international migration do originate from Asia!",
        subtitle = "Evolution of the number of Migrants per Region of Origin",
        x = " ",
        y = " ",
@@ -1825,7 +1829,8 @@ ggplot(slope_data, aes(x = year,
            direction = "y",
            segment.size = 0.2,
            segment.color = "grey50") +
-  scale_y_continuous( labels = scales::label_number(scale_cut = scales::cut_short_scale())) +
+  scale_y_continuous( labels = scales::label_number(scale_cut = scales::cut_short_scale()),
+                      expand = expansion(c(0, 0.01))  ) +
   labs(title = "Trends in International Migration Corridors",
        subtitle = "Top country-to-country Associations",
        x = "Year",
